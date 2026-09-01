@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- iPhone側のコンパニオンを持たない、Watch単体アプリ。
+	     WKApplication だけでは足りない。WKWatchOnly が無いと
+	     「WKCompanionAppBundleIdentifier を書け」と言われてインストールが弾かれる。 -->
+	<key>WKApplication</key>
+	<true/>
+	<key>WKWatchOnly</key>
+	<true/>
+	<!-- 画面を消しても計測を続けるため。HKWorkoutSession の稼働に必要 -->
+	<key>WKBackgroundModes</key>
+	<array>
+		<string>workout-processing</string>
+	</array>
+</dict>
+</plist>

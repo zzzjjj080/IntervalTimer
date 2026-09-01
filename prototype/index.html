@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>分割タイマー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F3239;
+    --bg-warn:#8A3D07;
+    --bg-done:#E8E2D4;
+    --ink:#F2F6F4;
+    --ink-dim:#7FA5A8;
+    --ink-warn:#F6D9B2;
+    --rule:rgba(242,246,244,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Archivo",system-ui,-apple-system,sans-serif;
+    background:var(--bg);color:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    transition:background-color .45s ease;
+    -webkit-font-smoothing:antialiased;
+  }
+  body.warn{background:var(--bg-warn)}
+  body.done{background:var(--bg-done);color:#17282C}
+  .screen{width:100%;max-width:400px;text-align:center}
+  .hide{display:none!important}
+
+  /* setup */
+  .field{display:flex;align-items:baseline;justify-content:space-between;
+    padding:18px 0;border-bottom:1px solid var(--rule)}
+  .field label{font-size:17px;color:var(--ink-dim)}
+  .field input{
+    width:5.5ch;background:none;border:none;color:var(--ink);
+    font-family:inherit;font-size:44px;font-weight:800;text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .field input:focus{outline:2px solid var(--ink);outline-offset:6px;border-radius:4px}
+  .field span{font-size:17px;color:var(--ink-dim);margin-left:6px}
+  .preview{margin:26px 0 30px;font-size:17px;color:var(--ink-dim);line-height:1.6}
+  .preview b{color:var(--ink);font-weight:600}
+
+  /* running */
+  .total{font-size:19px;color:var(--ink-dim);font-variant-numeric:tabular-nums;
+    letter-spacing:.02em}
+  body.warn .total{color:var(--ink-warn)}
+  body.done .total{color:#5A6B6E}
+  .total b{font-weight:600;font-size:30px;color:var(--ink);margin-left:10px}
+  body.done .total b{color:#17282C}
+  .split{
+    font-size:clamp(88px,29vw,150px);font-weight:800;line-height:.94;
+    font-variant-numeric:tabular-nums;letter-spacing:-.035em;margin:18px 0 4px;
+  }
+  .setcount{font-size:18px;color:var(--ink-dim);margin-bottom:26px}
+  body.warn .setcount{color:var(--ink-warn)}
+  body.done .setcount{color:#5A6B6E}
+  .bars{display:flex;gap:5px;margin-bottom:34px}
+  .bars i{flex:1;height:7px;border-radius:2px;background:rgba(242,246,244,.2)}
+  .bars i.done{background:var(--ink)}
+  .bars i.now{background:var(--ink);opacity:.55}
+  body.done .bars i{background:rgba(23,40,44,.25)}
+  body.done .bars i.done{background:#17282C}
+
+  /* buttons */
+  .row{display:flex;gap:12px}
+  button{
+    flex:1;font-family:inherit;font-size:18px;font-weight:600;
+    padding:19px 12px;border-radius:14px;border:1px solid var(--rule);
+    background:none;color:var(--ink);cursor:pointer;
+    transition:transform .12s ease,background-color .2s ease;
+  }
+  button:hover{background:rgba(242,246,244,.08)}
+  button:active{transform:scale(.97)}
+  button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+  .primary{background:var(--ink);color:var(--bg);border-color:transparent}
+  .primary:hover{background:#fff}
+  body.done button{border-color:rgba(23,40,44,.25);color:#17282C}
+  body.done .primary{background:#17282C;color:var(--bg-done)}
+  .sound{margin-top:20px;font-size:15px;color:var(--ink-dim);
+    background:none;border:none;padding:6px;flex:none;width:100%}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="screen" id="setup">
+  <div class="field">
+    <label for="total">全体</label>
+    <div><input id="total" type="number" min="1" max="180" value="20" inputmode="numeric"><span>分</span></div>
+  </div>
+  <div class="field">
+    <label for="parts">分割</label>
+    <div><input id="parts" type="number" min="1" max="12" value="4" inputmode="numeric"><span>回</span></div>
+  </div>
+  <p class="preview">1区切り <b id="each">5分00秒</b><br>残り20%で色が変わって軽く振動</p>
+  <div class="row"><button class="primary" id="start">開始</button></div>
+  <button class="sound" id="soundToggle" aria-pressed="true">音: オン</button>
+</div>
+
+<div class="screen hide" id="run">
+  <p class="total">全体 <b id="totalLeft">20:00</b></p>
+  <p class="split" id="splitLeft">5:00</p>
+  <p class="setcount" id="setLabel">1 / 4</p>
+  <div class="bars" id="bars"></div>
+  <div class="row">
+    <button id="pause">一時停止</button>
+    <button id="reset">リセット</button>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let totalSec = 1200, parts = 4, splitSec = 300;
+let startedAt = 0, accrued = 0, running = false, raf = null;
+let lastIndex = -1, warned = false, soundOn = true, ac = null;
+
+const fmt = s => {
+  s = Math.max(0, Math.ceil(s - 1e-6));
+  return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+};
+const fmtEach = s => Math.floor(s / 60) + "分" + String(Math.round(s % 60)).padStart(2, "0") + "秒";
+
+function updatePreview(){
+  const t = Math.max(1, +$("total").value || 1), p = Math.max(1, +$("parts").value || 1);
+  $("each").textContent = fmtEach(t * 60 / p);
+}
+$("total").addEventListener("input", updatePreview);
+$("parts").addEventListener("input", updatePreview);
+
+function beep(freq, dur, vol){
+  if(!soundOn) return;
+  try{
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.value = freq; o.type = "sine";
+    g.gain.setValueAtTime(vol, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + dur);
+    o.connect(g); g.connect(ac.destination);
+    o.start(); o.stop(ac.currentTime + dur);
+  }catch(e){}
+}
+const buzz = p => { if(navigator.vibrate) navigator.vibrate(p); };
+
+$("soundToggle").addEventListener("click", e => {
+  soundOn = !soundOn;
+  e.target.textContent = "音: " + (soundOn ? "オン" : "オフ");
+  e.target.setAttribute("aria-pressed", soundOn);
+});
+
+$("start").addEventListener("click", () => {
+  totalSec = Math.max(1, +$("total").value || 1) * 60;
+  parts = Math.min(12, Math.max(1, +$("parts").value || 1));
+  splitSec = totalSec / parts;
+  accrued = 0; lastIndex = -1; warned = false;
+  $("bars").innerHTML = Array.from({length: parts}, () => "<i></i>").join("");
+  $("setup").classList.add("hide"); $("run").classList.remove("hide");
+  try{ ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); }catch(e){}
+  begin();
+});
+
+function begin(){
+  startedAt = Date.now(); running = true;
+  $("pause").textContent = "一時停止";
+  tick();
+}
+$("pause").addEventListener("click", () => {
+  if(running){
+    accrued += (Date.now() - startedAt) / 1000; running = false;
+    cancelAnimationFrame(raf); $("pause").textContent = "再開";
+  } else begin();
+});
+$("reset").addEventListener("click", () => {
+  running = false; cancelAnimationFrame(raf);
+  document.body.classList.remove("warn", "done");
+  $("run").classList.add("hide"); $("setup").classList.remove("hide");
+});
+
+function tick(){
+  // 経過は絶対時刻の差分で算出する。画面が消えても復帰時にズレない。
+  const elapsed = accrued + (running ? (Date.now() - startedAt) / 1000 : 0);
+  const leftTotal = totalSec - elapsed;
+
+  if(leftTotal <= 0){
+    $("totalLeft").textContent = "0:00"; $("splitLeft").textContent = "0:00";
+    $("setLabel").textContent = "終了";
+    [...$("bars").children].forEach(b => { b.className = "done"; });
+    document.body.classList.remove("warn"); document.body.classList.add("done");
+    running = false;
+    buzz([120, 60, 120, 60, 320]); beep(300, .7, .3);
+    $("pause").textContent = "再開";
+    return;
+  }
+
+  const idx = Math.min(parts - 1, Math.floor(elapsed / splitSec));
+  const leftSplit = splitSec - (elapsed - idx * splitSec);
+
+  if(idx !== lastIndex){
+    if(lastIndex !== -1){ buzz([90, 50, 260]); beep(440, .45, .28); }  // 分割の切れ目: 強く
+    lastIndex = idx; warned = false;
+    document.body.classList.remove("warn");
+    [...$("bars").children].forEach((b, i) => {
+      b.className = i < idx ? "done" : (i === idx ? "now" : "");
+    });
+  }
+  if(!warned && leftSplit <= splitSec * .2){
+    warned = true;
+    document.body.classList.add("warn");
+    buzz(45); beep(880, .12, .18);  // 残り20%: 軽く
+  }
+
+  $("totalLeft").textContent = fmt(leftTotal);
+  $("splitLeft").textContent = fmt(leftSplit);
+  $("setLabel").textContent = (idx + 1) + " / " + parts;
+
+  if(running) raf = requestAnimationFrame(tick);
+}
+
+updatePreview();
+</script>
+</body>
+</html>
