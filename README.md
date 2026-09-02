@@ -54,6 +54,9 @@ SPEC.md                     実装仕様
 
 ## 確認
 
+**シミュレータは1台だけ起動する。** 複数起動していると `booted` が別の端末に飛ぶ。
+UDIDで名指しするのが確実。
+
 ```bash
 # ロジック（Xcode不要・速い）
 cd IntervalTimerCore && swift test
@@ -65,11 +68,22 @@ cd IntervalTimer && xcodebuild -project IntervalTimer.xcodeproj -scheme Interval
   -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' build
 xcrun simctl install booted "$(find ~/Library/Developer/Xcode/DerivedData/IntervalTimer-*/Build/Products/Debug-watchsimulator -maxdepth 1 -name IntervalTimer.app)"
 
-# 確認したい画面へ直接入る（DEBUG構成のみ。"全体分,分割,何秒前に始めたことにするか"）
-SIMCTL_CHILD_IT_NO_WORKOUT=1 SIMCTL_CHILD_IT_START="20,4,250" \
-  xcrun simctl launch booted com.zzzjjj080.IntervalTimer     # 警告色
-SIMCTL_CHILD_IT_NO_WORKOUT=1 SIMCTL_CHILD_IT_START="20,4,1200" \
-  xcrun simctl launch booted com.zzzjjj080.IntervalTimer     # 終了画面
+# 確認したい画面へ直接入る（DEBUG構成のみ）
+#   IT_START="全体分,分割,何秒前に始めたことにするか"
+#   IT_PAUSED=1        一時停止した状態で出す
+#   IT_SHEET=save|edit|delete   シートを開いた状態で出す
+#   IT_NO_WORKOUT=1    ヘルスケアの許可を求めない
+W=$(xcrun simctl list devices booted | grep -o '[0-9A-F-]\{36\}' | head -1)
+SIMCTL_CHILD_IT_NO_WORKOUT=1 SIMCTL_CHILD_IT_START="20,4,250"  xcrun simctl launch "$W" com.zzzjjj080.IntervalTimer   # 警告色
+SIMCTL_CHILD_IT_NO_WORKOUT=1 SIMCTL_CHILD_IT_START="20,4,1200" xcrun simctl launch "$W" com.zzzjjj080.IntervalTimer   # 終了画面
+SIMCTL_CHILD_IT_NO_WORKOUT=1 SIMCTL_CHILD_IT_SHEET=delete      xcrun simctl launch "$W" com.zzzjjj080.IntervalTimer   # 消す確認
+
+# 保存の確認（アプリの外から値を置いて、起動時に復元されるか見る）
+xcrun simctl spawn "$W" defaults write com.zzzjjj080.IntervalTimer lastMinutes -int 12
+
+# 「アプリが裏で止められた」状態の再現
+PID=$(xcrun simctl launch "$W" com.zzzjjj080.IntervalTimer | awk '{print $2}')
+kill -STOP "$PID"; sleep 30; kill -CONT "$PID"
 
 # リリース構成に確認用の入口が残っていないこと
 strings .../Release-watchsimulator/IntervalTimer.app/IntervalTimer | grep IT_START   # 何も出ないこと

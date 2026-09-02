@@ -242,7 +242,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "インターバル";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "練習中に画面を消しても時間の計測を続けるため、ワークアウトとして記録します。心拍と消費エネルギーの読み取りはこのためだけに使い、外部へ送信することはありません。";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "計測した練習を、ヘルスケアのワークアウトとして保存します。保存しない設定にはできますが、その場合は画面を消すとタイマーが止まります。";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "計測した練習を、ヘルスケアのワークアウトとして保存します。保存することで、腕を下ろして画面が消えている間もタイマーが動き続けます。";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -277,7 +277,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "インターバル";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "練習中に画面を消しても時間の計測を続けるため、ワークアウトとして記録します。心拍と消費エネルギーの読み取りはこのためだけに使い、外部へ送信することはありません。";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "計測した練習を、ヘルスケアのワークアウトとして保存します。保存しない設定にはできますが、その場合は画面を消すとタイマーが止まります。";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "計測した練習を、ヘルスケアのワークアウトとして保存します。保存することで、腕を下ろして画面が消えている間もタイマーが動き続けます。";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
