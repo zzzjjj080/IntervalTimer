@@ -35,12 +35,16 @@ final class WorkoutKeeper: NSObject {
     var firstError: String? { errors.first }
 
     private let store = HKHealthStore()
+    /// 自分で終わらせている最中かどうか。
+    /// `session.end()` を呼ぶと `didChangeTo .ended` が飛んでくるので、
+    /// これが無いと「外から止められました」という嘘のエラーを出してしまう。
+    private var isEnding = false
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
     private var extended: WKExtendedRuntimeSession?
 
     private var shareTypes: Set<HKSampleType> {
-        [HKQuantityType.workoutType(), HKQuantityType(.activeEnergyBurned)]
+        [HKObjectType.workoutType(), HKQuantityType(.activeEnergyBurned)]
     }
     private var readTypes: Set<HKObjectType> {
         [HKQuantityType(.heartRate), HKQuantityType(.activeEnergyBurned)]
@@ -50,6 +54,7 @@ final class WorkoutKeeper: NSObject {
 
     func start() async {
         errors.removeAll()
+        isEnding = false
 
         guard HKHealthStore.isHealthDataAvailable() else {
             errors.append("この端末ではヘルスケアが使えません。")
@@ -66,7 +71,7 @@ final class WorkoutKeeper: NSObject {
         }
 
         // requestAuthorization は「拒否された」場合も成功で返る。状態を別に見る必要がある。
-        guard store.authorizationStatus(for: HKQuantityType.workoutType()) == .sharingAuthorized else {
+        guard store.authorizationStatus(for: HKObjectType.workoutType()) == .sharingAuthorized else {
             errors.append("ワークアウトの保存が許可されていません。")
             startExtendedSession()
             return
@@ -108,6 +113,7 @@ final class WorkoutKeeper: NSObject {
     /// タイマーが終わった／リセットされたときに呼ぶ。
     /// ワークアウトは**保存する**。動かしっぱなしで捨てると、目的外の使い方に見えてしまう。
     func end() async {
+        isEnding = true
         if let session, let builder {
             let now = Date()
             session.end()
@@ -125,6 +131,7 @@ final class WorkoutKeeper: NSObject {
         extended = nil
 
         mode = .none
+        isEnding = false
     }
 }
 
@@ -140,7 +147,8 @@ extension WorkoutKeeper: HKWorkoutSessionDelegate {
     ) {
         guard toState == .stopped || toState == .ended else { return }
         Task { @MainActor in
-            // 自分で終わらせた場合はもう none になっている。外側の要因で止まった場合だけ拾う。
+            // 自分で終わらせているなら、これは想定どおりの通知。エラーにしない。
+            guard !self.isEnding else { return }
             if self.mode == .workout, self.session != nil {
                 self.errors.append("ワークアウトが外から止められました。画面を消すと計測が止まります。")
                 self.mode = .none

@@ -44,6 +44,7 @@ struct RunView: View {
 
             // 現在の区切りの残り（画面の主役）
             splitText(d)
+                .accessibilityIdentifier("splitRemaining")
                 .font(.system(size: 60, weight: .heavy, design: .rounded))
                 .monospacedDigit()
                 .minimumScaleFactor(0.4)
@@ -53,6 +54,7 @@ struct RunView: View {
             Spacer(minLength: 2)
 
             Text("\(d.index + 1) / \(d.config.parts)")
+                .accessibilityIdentifier("splitIndex")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(skin.inkDim)
                 .padding(.bottom, 6)
@@ -73,9 +75,11 @@ struct RunView: View {
                 SmallButton(title: d.isPaused ? "再開" : "一時停止", skin: skin) {
                     runner.pauseOrResume()
                 }
+                .accessibilityIdentifier("pause")
                 SmallButton(title: "リセット", skin: skin) {
                     runner.reset()
                 }
+                .accessibilityIdentifier("reset")
             }
         }
         .padding(.horizontal, 6)
@@ -88,13 +92,17 @@ struct RunView: View {
     // 常時表示（Always-On）のままでもアプリのコードを動かさずに数字が進む。
     // 止まっている間は動かないので、素のテキストにする。
 
+    // `showsHours` は常に true を渡す。あちらの true は「常に時を出す」ではなく
+    // 「1時間を超えたら出す」で、`TimeText.clock` の既定と同じ判断になる。
+    // 設定の長さで true/false を出し分けると、逆に両者がずれる。
+
     @ViewBuilder
     private func totalText(_ d: Runner.Display) -> some View {
         if d.isPaused || d.isFinished {
             Text(TimeText.clock(d.frozenTotal))
         } else {
             Text(timerInterval: d.anchor...d.anchor.addingTimeInterval(d.config.totalSeconds),
-                 pauseTime: nil, countsDown: true, showsHours: d.config.totalSeconds >= 3600)
+                 pauseTime: nil, countsDown: true, showsHours: true)
         }
     }
 
@@ -105,8 +113,7 @@ struct RunView: View {
         } else {
             let from = d.anchor.addingTimeInterval(d.config.boundary(d.index))
             let to = d.anchor.addingTimeInterval(d.config.boundary(d.index + 1))
-            Text(timerInterval: from...to, pauseTime: nil, countsDown: true,
-                 showsHours: d.config.splitSeconds >= 3600)
+            Text(timerInterval: from...to, pauseTime: nil, countsDown: true, showsHours: true)
         }
     }
 }

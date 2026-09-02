@@ -28,8 +28,10 @@ struct DoneView: View {
                 Spacer(minLength: 0)
 
                 SmallButton(title: "もう一度", skin: .done) { runner.again() }
+                    .accessibilityIdentifier("again")
                     .padding(.bottom, 6)
                 SmallButton(title: "設定に戻る", skin: .done) { runner.reset() }
+                    .accessibilityIdentifier("backToSetup")
             }
             .padding(.horizontal, 6)
             .padding(.vertical, 4)

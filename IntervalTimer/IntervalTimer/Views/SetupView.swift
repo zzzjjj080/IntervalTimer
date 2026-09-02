@@ -53,6 +53,7 @@ struct SetupView: View {
                             )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("start")
                     .padding(.top, 2)
 
                     presetSection
@@ -73,6 +74,7 @@ struct SetupView: View {
             // 保存してある値をつまみ側にも入れておく。ここは素の代入で済ませる。
             crownMinutes = Double(minutes)
             crownParts = Double(parts)
+            openSheetForCheckingIfAsked()
         }
         .sheet(isPresented: $showingSave) {
             SavePresetSheet(config: config) { name in
@@ -88,6 +90,22 @@ struct SetupView: View {
         }
     }
 
+    /// シートを開いた状態で起動するための入口。
+    ///
+    /// シミュレータへの合成タップはシートに届かないので（引き継ぎ書 4-24）、
+    /// ここを通さないと保存・整理の画面を一度も見られない。
+    ///
+    ///     SIMCTL_CHILD_IT_SHEET=save xcrun simctl launch <udid> com.zzzjjj080.IntervalTimer
+    private func openSheetForCheckingIfAsked() {
+        #if DEBUG
+        switch ProcessInfo.processInfo.environment["IT_SHEET"] {
+        case "save": showingSave = true
+        case "edit", "delete": showingEdit = true
+        default: break
+        }
+        #endif
+    }
+
     // MARK: - 数値の行
 
     private func valueRow(label: String, unit: String, field: Field,
@@ -97,6 +115,7 @@ struct SetupView: View {
             stepButton(systemName: "minus") {
                 set(value, crown, to: value.wrappedValue - 1, in: range)
             }
+            .accessibilityIdentifier("\(field)-minus")
 
             VStack(spacing: -1) {
                 Text(label)
@@ -117,6 +136,7 @@ struct SetupView: View {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(Skin.normal.ink.opacity(focus == field ? 0.14 : 0.06))
             )
+            .accessibilityIdentifier("\(field)-value")
             .contentShape(Rectangle())
             .focusable()
             .focused($focus, equals: field)
@@ -134,6 +154,7 @@ struct SetupView: View {
             stepButton(systemName: "plus") {
                 set(value, crown, to: value.wrappedValue + 1, in: range)
             }
+            .accessibilityIdentifier("\(field)-plus")
         }
     }
 
@@ -215,6 +236,7 @@ struct SetupView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("preset-\(preset.displayName)")
                 }
             }
             .padding(.top, 6)

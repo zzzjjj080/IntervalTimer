@@ -69,6 +69,15 @@ struct EditPresetsSheet: View {
             .padding(.horizontal, 4)
         }
         .background(Skin.normal.background.ignoresSafeArea())
+        .onAppear {
+            #if DEBUG
+            // 消す確認の画面は、合成タップでは一度も見られない（引き継ぎ書 4-24）。
+            // 破壊的な操作こそ目で確かめたいので、ここから入れるようにしておく。
+            if ProcessInfo.processInfo.environment["IT_SHEET"] == "delete" {
+                pendingDelete = book.presets.first
+            }
+            #endif
+        }
     }
 
     private var list: some View {

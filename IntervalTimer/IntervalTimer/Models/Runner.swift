@@ -44,6 +44,11 @@ final class Runner {
 
     private var engine: TimerEngine?
     private var ticker: Task<Void, Never>?
+
+    /// ワークアウトの開始・終了を1本の列に並べる。
+    /// 「終了」と、その直後の「もう一度」の開始が同時に走ると、
+    /// 終了処理が、始まったばかりのセッションを畳んでしまう。
+    private var keeperWork: Task<Void, Never>?
     private let haptics = Haptics()
 
     /// 判定の間隔。1秒ごとだと20%に達した瞬間の検出が最大1秒遅れる。
@@ -165,7 +170,9 @@ final class Runner {
         // 背面動作そのものの確認は実機でやる。
         if ProcessInfo.processInfo.environment["IT_NO_WORKOUT"] == "1" { return }
         #endif
-        Task {
+        let previous = keeperWork
+        keeperWork = Task {
+            await previous?.value
             await keeper.start()
             switch keeper.mode {
             case .workout:
@@ -180,6 +187,10 @@ final class Runner {
     }
 
     private func letGo() {
-        Task { await keeper.end() }
+        let previous = keeperWork
+        keeperWork = Task {
+            await previous?.value
+            await keeper.end()
+        }
     }
 }

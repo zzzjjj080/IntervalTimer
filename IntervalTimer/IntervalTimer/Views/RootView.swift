@@ -32,6 +32,8 @@ struct RootView: View {
         guard n.count >= 2 else { return }
         runner.start(config: TimerConfig(minutes: n[0], parts: n[1]),
                      backdated: n.count > 2 ? TimeInterval(n[2]) : 0)
+        // `IT_PAUSED=1` で、一時停止した状態の画面をそのまま出す。
+        if ProcessInfo.processInfo.environment["IT_PAUSED"] == "1" { runner.pauseOrResume() }
         #endif
     }
 }

@@ -25,6 +25,24 @@ struct TimeTextTests {
         #expect(TimeText.clock(3599) == "59:59")
     }
 
+    @Test func 既定はText_timerInterval_showsHours_trueと同じ判断になる() {
+        // 実機で確認した挙動：showsHours: true でも、1時間未満なら時を出さない。
+        // 動いている間（システムが描く）と止まっている間（こちらが描く）でずれないこと。
+        #expect(TimeText.clock(2697) == "44:57")     // 実機のスクリーンショットと同じ
+        #expect(TimeText.clock(3600) == "1:00:00")
+        #expect(TimeText.clock(3599) == "59:59")
+        #expect(TimeText.clock(10800) == "3:00:00")  // 全体180分
+    }
+
+    @Test func 時を出すかどうかは明示して上書きできる() {
+        #expect(TimeText.clock(2700, showsHours: true) == "0:45:00")
+        #expect(TimeText.clock(2700, showsHours: false) == "45:00")
+        #expect(TimeText.clock(59, showsHours: true) == "0:00:59")
+        // 時を出さないと決めたら、60分を超えても分に足し込む
+        #expect(TimeText.clock(3660, showsHours: false) == "61:00")
+        #expect(TimeText.clock(10800, showsHours: false) == "180:00")
+    }
+
     @Test func 浮動小数の誤差で一秒多く出さない() {
         #expect(TimeText.clock(300.0000000001) == "5:00")
         #expect(TimeText.clock(1200.0 - 0.0) == "20:00")
