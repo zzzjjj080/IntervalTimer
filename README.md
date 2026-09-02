@@ -52,6 +52,33 @@ SPEC.md                     実装仕様
 許可が取れなければ `WKExtendedRuntimeSession` へ落ち、その旨を画面に1行出す。
 失敗は握り潰さず、理由をそのまま画面に出す。
 
+## 投げ銭（コーヒーを奢る）
+
+共通実装（`~/Claude/shared/TipJar/`）の `TipJar.swift` をそのまま入れてある。
+UIだけ、この画面の配色に合わせて `Views/CoffeeTip.swift` に書き下ろした。
+
+- 製品ID: `com.zzzjjj080.IntervalTimer.coffee`（消耗型・200円）
+- 金額は `product.displayPrice` をそのまま出す。「¥200」と決め打ちしない
+- 「寄付」「Donation」「カンパ」と書かない
+- 杯数は端末内にだけ残る。消耗型は復元されないので、機種変更で0に戻る
+
+**`Coffee.storekit` は `IntervalTimer/`（.xcodeproj と同じ階層）に置いてある。**
+同期フォルダの中に入れるとリリースビルドのappに同梱される。確認:
+
+```bash
+find path/to/IntervalTimer.app -name "*.storekit"   # 何も出ないこと
+```
+
+**StoreKit の設定は Xcode が起動時に差し込むもので、`simctl launch` では効かない。**
+シミュレータから投げ銭の行を出す手段が無いので、並びの確認だけ
+`IT_TIP_DEMO=1`（DEBUG限定・値段を偽って描くだけ）で行った。**購入は実機で確かめる。**
+
+まだできていないこと:
+
+- App Store Connect にアプリが無いので、**課金の製品をまだ作れない**（アプリ登録が先）
+- `.xcscheme` に書いた `Coffee.storekit` のパスが効くか未確認。
+  効かなければ Xcode の Edit Scheme → Run → Options → StoreKit Configuration で選ぶ
+
 ## 確認
 
 **シミュレータは1台だけ起動する。** 複数起動していると `booted` が別の端末に飛ぶ。

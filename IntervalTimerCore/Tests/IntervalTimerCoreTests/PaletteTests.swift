@@ -12,6 +12,7 @@ struct PaletteTests {
         #expect(Contrast.ratio(PaletteHex.warnInkDim, PaletteHex.warnBackground) >= 4.5)
         #expect(Contrast.ratio(PaletteHex.doneInk, PaletteHex.doneBackground) >= 4.5)
         #expect(Contrast.ratio(PaletteHex.doneInkDim, PaletteHex.doneBackground) >= 4.5)
+        #expect(Contrast.ratio(PaletteHex.tipInk, PaletteHex.background) >= 4.5)
     }
 
     @Test func 大きな数字はAA基準の大文字を満たす() {
