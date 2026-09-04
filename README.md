@@ -22,6 +22,7 @@ IntervalTimer/              watchOS アプリ
     Models/Runner.swift     画面とエンジンをつなぐ
     Services/               ハプティクス、HKWorkoutSession
     Views/                  設定・実行・終了
+      Components/SegmentRing.swift  区切りぶんに分かれた円環
 prototype/index.html        挙動を決めたHTMLプロトタイプ
 SPEC.md                     実装仕様
 ```
@@ -40,6 +41,22 @@ SPEC.md                     実装仕様
 そのぶん、**アプリ側の状態は「本当に変わった瞬間」しか動かさない**（区切り・警告・停止だけ）。
 区切りの判定とハプティクスは自前の0.1秒ループでやる。
 
+## 画面の作り
+
+実行中は、**区切りぶんに分かれた円環**の中に数字を置く。1本の弧が1区切りで、
+消化済みは塗り、進行中は途中まで塗る。数字を読まなくても、
+「いま何区切り目か」と「その中でどこまで来たか」が掴める。
+
+円環だけは `TimelineView(.periodic(by: 1))` で1秒ごとに描き直す。
+秒の数字はシステムが描いているので、そちらを巻き込まない。
+0.1秒ごとにすれば滑らかになるが、1区切り5分なら1秒で弧の1/300しか進まず段は見えない。
+**腕に着けて1時間動かすものなので、粗いほうを選んでいる。**
+
+**円環の大きさは `WKInterfaceDevice.screenBounds` から決める。**
+`GeometryReader` に測らせると、安全領域の扱いで高さが 157pt にも 210pt にもなり、
+そのたびに円環が縮んで数字と重なった。画面の実寸から決めれば、機種が変わっても1か所で効く。
+安全領域を外すのは、いちばん外側の1か所だけ（重ねて外すとかえって狭くなる）。
+
 ## 背面で動かし続ける
 
 `HKWorkoutSession`（`.baseball` / `.outdoor`）が `.running` の間、
@@ -51,33 +68,6 @@ SPEC.md                     実装仕様
 
 許可が取れなければ `WKExtendedRuntimeSession` へ落ち、その旨を画面に1行出す。
 失敗は握り潰さず、理由をそのまま画面に出す。
-
-## 投げ銭（コーヒーを奢る）
-
-共通実装（`~/Claude/shared/TipJar/`）の `TipJar.swift` をそのまま入れてある。
-UIだけ、この画面の配色に合わせて `Views/CoffeeTip.swift` に書き下ろした。
-
-- 製品ID: `com.zzzjjj080.IntervalTimer.coffee`（消耗型・200円）
-- 金額は `product.displayPrice` をそのまま出す。「¥200」と決め打ちしない
-- 「寄付」「Donation」「カンパ」と書かない
-- 杯数は端末内にだけ残る。消耗型は復元されないので、機種変更で0に戻る
-
-**`Coffee.storekit` は `IntervalTimer/`（.xcodeproj と同じ階層）に置いてある。**
-同期フォルダの中に入れるとリリースビルドのappに同梱される。確認:
-
-```bash
-find path/to/IntervalTimer.app -name "*.storekit"   # 何も出ないこと
-```
-
-**StoreKit の設定は Xcode が起動時に差し込むもので、`simctl launch` では効かない。**
-シミュレータから投げ銭の行を出す手段が無いので、並びの確認だけ
-`IT_TIP_DEMO=1`（DEBUG限定・値段を偽って描くだけ）で行った。**購入は実機で確かめる。**
-
-まだできていないこと:
-
-- App Store Connect にアプリが無いので、**課金の製品をまだ作れない**（アプリ登録が先）
-- `.xcscheme` に書いた `Coffee.storekit` のパスが効くか未確認。
-  効かなければ Xcode の Edit Scheme → Run → Options → StoreKit Configuration で選ぶ
 
 ## 確認
 

@@ -14,9 +14,6 @@ struct SetupView: View {
     @State private var crownMinutes: Double = 20
     @State private var crownParts: Double = 4
 
-    /// 「コーヒーを奢る」。製品IDは App Store Connect 側と1文字でも違うと出なくなる。
-    @State private var tipJar = TipJar(productID: "com.zzzjjj080.IntervalTimer.coffee")
-
     @State private var showingSave = false
     @State private var showingEdit = false
 
@@ -68,8 +65,6 @@ struct SetupView: View {
                             .multilineTextAlignment(.center)
                             .padding(.top, 6)
                     }
-
-                    CoffeeTip(tipJar: tipJar)
                 }
                 .padding(.horizontal, 4)
                 .padding(.vertical, 4)

@@ -17,9 +17,6 @@ public enum PaletteHex {
     public static let warnInk: UInt32        = 0x1A1207
     public static let warnInkDim: UInt32     = 0x2B1D0A
 
-    /// 投げ銭の1行。警告の琥珀そのままだと、小さな文字には暗すぎて 4.5:1 に届かない。
-    public static let tipInk: UInt32 = 0xE0913A
-
     /// 終了。いちばん明るい。
     public static let doneBackground: UInt32 = 0xE8E2D4
     public static let doneInk: UInt32        = 0x17282C
