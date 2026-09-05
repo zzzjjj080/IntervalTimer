@@ -29,6 +29,16 @@ fi
 # no DDI は「中身を送れない状態」なので除く。
 # grep の空振りで無言終了しないよう || true を付ける（引き継ぎ書 4-19）。
 LINE=$(xcrun devicectl list devices 2>/dev/null | grep -i 'Apple Watch' | grep ' connected ' | grep -v 'no DDI' | head -1 || true)
+
+# 一覧を眺めるだけでは繋がらない。**こちらから話しかけるとトンネルが張られる。**
+# `available (paired)` のまま何十分も待っていたのに、この1行で即 connected になった。
+if [ -z "$LINE" ]; then
+  echo "→ 起こしにいきます（30秒ほど）"
+  ID=$(xcrun devicectl list devices 2>/dev/null | grep -i 'Apple Watch' | grep -oE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}' | head -1 || true)
+  [ -n "$ID" ] && xcrun devicectl device info details --device "$ID" --timeout 60 >/dev/null 2>&1 || true
+  LINE=$(xcrun devicectl list devices 2>/dev/null | grep -i 'Apple Watch' | grep ' connected ' | grep -v 'no DDI' | head -1 || true)
+fi
+
 if [ -z "$LINE" ]; then
   echo "❌ Apple Watch が接続されていません。"
   echo "   Watchを腕に着けてロックを解除し、ペアリング中のiPhoneをMacに繋いでください。"
