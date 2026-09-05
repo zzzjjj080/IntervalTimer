@@ -42,10 +42,12 @@ struct SetupView: View {
             ScrollView {
                 VStack(spacing: 4) {
                     valueRow(label: "全体", unit: String(localized: "分"), field: .minutes,
+                             tint: Color(hex: PaletteHex.totalInk),
                              value: $minutes, crown: $crownMinutes,
                              range: TimerConfig.minuteRange)
 
                     valueRow(label: "分割", unit: String(localized: "回"), field: .parts,
+                             tint: Color(hex: PaletteHex.splitsInk),
                              value: $parts, crown: $crownParts,
                              range: TimerConfig.partsRange)
 
@@ -93,36 +95,39 @@ struct SetupView: View {
     /// `unit` は**訳し終えた文字**で受ける。英語では単位が要らないので空文字になり、
     /// そのときは何も描かない。空の `Text` を置くと、豆腐（□）が出る。
     private func valueRow(label: LocalizedStringKey, unit: String, field: Field,
+                          tint: Color,
                           value: Binding<Int>, crown: Binding<Double>,
                           range: ClosedRange<Int>) -> some View {
         HStack(spacing: 4) {
-            stepButton(systemName: "minus") {
+            StepButton(systemName: "minus", tint: tint, width: stepWidth) {
                 set(value, crown, to: value.wrappedValue - 1, in: range)
             }
             .accessibilityIdentifier("\(field)-minus")
 
             VStack(spacing: -1) {
                 Text(label)
-                    .font(.system(size: 11))
-                    .foregroundStyle(Skin.normal.inkDim)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(tint)
                 HStack(alignment: .firstTextBaseline, spacing: 1) {
                     Text("\(value.wrappedValue)")
                         .font(.system(size: 27, weight: .heavy, design: .rounded))
                         .monospacedDigit()
                         .minimumScaleFactor(0.6)
                         .lineLimit(1)
+                        // **数字は白のまま。** 色にすると、いちばん読みたいものが弱くなる。
+                        // 色は見出し・単位・地・ボタンで足りる
                         .foregroundStyle(Skin.normal.ink)
                     if !unit.isEmpty {
                         Text(unit)
                             .font(.system(size: 11))
-                            .foregroundStyle(Skin.normal.inkDim)
+                            .foregroundStyle(tint.opacity(0.7))
                     }
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 44)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Skin.normal.ink.opacity(focus == field ? 0.14 : 0.06))
+                    .fill(tint.opacity(focus == field ? 0.34 : 0.20))
             )
             .accessibilityIdentifier("\(field)-value")
             .contentShape(Rectangle())
@@ -139,26 +144,11 @@ struct SetupView: View {
                 if value.wrappedValue != rounded { value.wrappedValue = rounded }
             }
 
-            stepButton(systemName: "plus") {
+            StepButton(systemName: "plus", tint: tint, width: stepWidth) {
                 set(value, crown, to: value.wrappedValue + 1, in: range)
             }
             .accessibilityIdentifier("\(field)-plus")
         }
-    }
-
-    /// グローブでも押せるよう、高さ44pt・幅は画面の27%。`minus.circle` のような細い記号は避ける。
-    private func stepButton(systemName: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(Skin.normal.stepTint)
-                .frame(width: stepWidth, height: 44)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(Skin.normal.stepTint.opacity(0.16))
-                )
-        }
-        .buttonStyle(.plain)
     }
 
     private func set(_ value: Binding<Int>, _ crown: Binding<Double>, to new: Int, in range: ClosedRange<Int>) {
@@ -166,7 +156,7 @@ struct SetupView: View {
         guard v != value.wrappedValue else { return }
         value.wrappedValue = v
         crown.wrappedValue = Double(v)
-        WKInterfaceDevice.current().play(.click)
+        // 触覚は ``StepButton`` が鳴らす。長押しの連続では間引くため、ここでは鳴らさない
     }
 
     // MARK: - プレビュー

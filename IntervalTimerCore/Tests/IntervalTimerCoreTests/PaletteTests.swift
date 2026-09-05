@@ -47,6 +47,8 @@ struct PaletteTests {
     @Test func ボタンの色も読める() {
         // ボタンの文字は小さいので本文の基準（4.5:1）。
         #expect(Contrast.ratio(PaletteHex.goInk, PaletteHex.background) >= 4.5)
+        #expect(Contrast.ratio(PaletteHex.totalInk, PaletteHex.background) >= 4.5)
+        #expect(Contrast.ratio(PaletteHex.splitsInk, PaletteHex.background) >= 4.5)
         #expect(Contrast.ratio(PaletteHex.stopInk, PaletteHex.background) >= 4.5)
         // 「開始」は塗りつぶしなので、塗りと文字の間で測る。
         #expect(Contrast.ratio(PaletteHex.warnInk, PaletteHex.startFill) >= 4.5)

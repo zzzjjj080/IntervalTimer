@@ -20,6 +20,11 @@ public enum PaletteHex {
     /// 設定画面で「1区切り◯分」の数字に使う暖色。地の色の上で 7:1 出る。
     public static let accent: UInt32 = 0xE8C04A
 
+    /// 設定画面の行ごとの色。円環の色（冷たい側）から取っている。
+    /// **行ごとに色を変えると、どちらをいじっているのか一目で分かる。**
+    public static let totalInk: UInt32  = 0xA8DCE3   // 全体
+    public static let splitsInk: UInt32 = 0x4EC3AE   // 分割
+
     /// 「開始」ボタンの塗り。いちばん押すものなので、画面で一番目立たせる。
     /// 文字は ``warnInk``（ほぼ黒）を載せる。白より読みやすい。
     public static let startFill: UInt32 = 0xE8760F
