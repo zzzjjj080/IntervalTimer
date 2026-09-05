@@ -28,7 +28,17 @@ public enum TimeText {
         return String(format: "%d:%02d", s / 60, sec)
     }
 
-    /// `5分00秒`。設定画面のプレビュー用。
+    /// `1分` `47秒` `2分20秒`。**ぴったりなら秒を出さない。**
+    /// 設定画面で「1区切りの長さ」を短く見せるのに使う。
+    public static func brief(_ seconds: Double) -> String {
+        let s = Int(ceil(max(0, seconds) - epsilon))
+        let m = s / 60, sec = s % 60
+        if m == 0 { return "\(sec)秒" }
+        if sec == 0 { return "\(m)分" }
+        return "\(m)分\(sec)秒"
+    }
+
+    /// `5分00秒`。
     public static func japanese(_ seconds: Double) -> String {
         let s = Int(ceil(max(0, seconds) - epsilon))
         let m = s / 60, sec = s % 60

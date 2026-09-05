@@ -167,15 +167,38 @@ struct SetupView: View {
 
     // MARK: - プレビュー
 
+    /// 1区切りの長さと、いま始めたら終わる時刻。
+    ///
+    /// 「1区切り 5分00秒」は長い。**`/5分` で意味は通る。**
+    /// 空いた横幅に「終わり 22:55」を出す。練習の予定と突き合わせるとき、
+    /// 20分という長さより「何時に終わるか」のほうが役に立つ。
     private var preview: some View {
-        HStack(spacing: 4) {
-            Text("1区切り")
-                .foregroundStyle(Skin.normal.inkDim)
-            Text(TimeText.japanese(config.splitSeconds))
-                .fontWeight(.semibold)
-                .foregroundStyle(Skin.normal.accent)
+        // 現在時刻から出すので、1分ごとに引き直す。秒までは要らない。
+        TimelineView(.everyMinute) { timeline in
+            HStack(spacing: 10) {
+                Text("/\(TimeText.brief(config.splitSeconds))")
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Skin.normal.accent)
+
+                HStack(spacing: 3) {
+                    Text("終わり")
+                        .foregroundStyle(Skin.normal.inkDim)
+                    Text(endTime(startingAt: timeline.date))
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Skin.normal.ink)
+                }
+            }
+            .font(.system(size: 14))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .frame(minHeight: 20)
         }
-        .font(.system(size: 14))
-        .frame(minHeight: 20)
+    }
+
+    /// いま始めたら終わる時刻。`22:55` のように分まで。
+    /// 24時間表記かどうかは端末の設定に従わせる。
+    private func endTime(startingAt now: Date) -> String {
+        now.addingTimeInterval(config.totalSeconds)
+            .formatted(date: .omitted, time: .shortened)
     }
 }

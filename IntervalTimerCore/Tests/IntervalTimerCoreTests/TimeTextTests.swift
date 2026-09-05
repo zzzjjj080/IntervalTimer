@@ -48,6 +48,16 @@ struct TimeTextTests {
         #expect(TimeText.clock(1200.0 - 0.0) == "20:00")
     }
 
+    @Test func 短い表記はぴったりなら秒を出さない() {
+        #expect(TimeText.brief(60) == "1分")
+        #expect(TimeText.brief(300) == "5分")
+        #expect(TimeText.brief(47) == "47秒")
+        #expect(TimeText.brief(140) == "2分20秒")
+        #expect(TimeText.brief(0) == "0秒")
+        // 20分を12分割すると100秒。1分40秒
+        #expect(TimeText.brief(100) == "1分40秒")
+    }
+
     @Test func プレビューの日本語表記() {
         #expect(TimeText.japanese(300) == "5分00秒")
         #expect(TimeText.japanese(140) == "2分20秒")
