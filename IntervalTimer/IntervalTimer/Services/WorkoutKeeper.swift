@@ -52,9 +52,17 @@ final class WorkoutKeeper: NSObject {
 
     // MARK: - 開始
 
+    /// 実機の様子を `devicectl ... --console` で読むための記録。DEBUG限定。
+    private func log(_ message: String) {
+        #if DEBUG
+        print("[WorkoutKeeper] \(message)")
+        #endif
+    }
+
     func start() async {
         errors.removeAll()
         isEnding = false
+        log("start(): ヘルスケアが使えるか = \(HKHealthStore.isHealthDataAvailable())")
 
         guard HKHealthStore.isHealthDataAvailable() else {
             errors.append(String(localized: "この端末ではヘルスケアが使えません。"))
@@ -64,14 +72,19 @@ final class WorkoutKeeper: NSObject {
 
         do {
             try await store.requestAuthorization(toShare: shareTypes, read: readTypes)
+            log("requestAuthorization: 通った")
         } catch {
+            log("requestAuthorization: 失敗 \(error)")
             errors.append(String(localized: "ヘルスケアの許可を確認できませんでした: \(error.localizedDescription)"))
             startExtendedSession()
             return
         }
 
         // requestAuthorization は「拒否された」場合も成功で返る。状態を別に見る必要がある。
-        guard store.authorizationStatus(for: HKObjectType.workoutType()) == .sharingAuthorized else {
+        let st = store.authorizationStatus(for: HKObjectType.workoutType())
+        log("workoutType の状態 = \(st.rawValue)  (0=未定 1=拒否 2=許可)")
+        log("activeEnergy の状態 = \(store.authorizationStatus(for: HKQuantityType(.activeEnergyBurned)).rawValue)")
+        guard st == .sharingAuthorized else {
             errors.append(String(localized: "ワークアウトの保存が許可されていません。"))
             startExtendedSession()
             return
@@ -94,13 +107,16 @@ final class WorkoutKeeper: NSObject {
             self.session = session
             self.builder = builder
             self.mode = .workout
+            log("ワークアウトを開始した。state = \(session.state.rawValue) (1=notStarted 2=running)")
         } catch {
+            log("ワークアウトの開始で例外: \(error)")
             errors.append(String(localized: "ワークアウトを開始できませんでした: \(error.localizedDescription)"))
             startExtendedSession()
         }
     }
 
     private func startExtendedSession() {
+        log("予備の手段へ落ちる。errors = \(errors)")
         let s = WKExtendedRuntimeSession()
         s.delegate = self
         s.start()
@@ -145,6 +161,7 @@ extension WorkoutKeeper: HKWorkoutSessionDelegate {
         from fromState: HKWorkoutSessionState,
         date: Date
     ) {
+        Task { @MainActor in self.log("状態が変わった: \(fromState.rawValue) → \(toState.rawValue)") }
         guard toState == .stopped || toState == .ended else { return }
         Task { @MainActor in
             // 自分で終わらせているなら、これは想定どおりの通知。エラーにしない。

@@ -172,6 +172,27 @@ xcrun simctl launch "$W" com.zzzjjj080.IntervalTimer -AppleLanguages "(en)"
 
 **英語の名前は `Splits`（仮）。** ストア名は別に決める。
 
+## 実機の中で何が起きているかを読む
+
+シミュレータではヘルスケアの許可を越えられないので、ワークアウトまわりは実機でしか分からない。
+**`--console` で実機の `print` を読める。**
+
+```bash
+DEVICECTL_CHILD_IT_START="20,4,0" xcrun devicectl device process launch \
+  --device <CoreDeviceのID> --console --terminate-existing -t 60 \
+  com.zzzjjj080.IntervalTimer
+```
+
+`DEVICECTL_CHILD_` を付けた環境変数がアプリへ渡るので、`IT_START` と組み合わせれば
+**本人にタップしてもらわずに**実行画面まで入って、そこまでのログを読める。
+
+`WorkoutKeeper` は各段階を `log()` に出している（DEBUG限定）。
+「ワークアウトが動いていない」と思ったときは、まずこれを読む。
+
+**緑のランニングマークはアプリの中には出ない。** 文字盤に戻ったときに上部へ出る。
+アプリを開いている間はそこに時計が出るだけなので、これを見て
+「動いていない」と判断しないこと。
+
 ## 確認
 
 **シミュレータは1台だけ起動する。** 複数起動していると `booted` が別の端末に飛ぶ。

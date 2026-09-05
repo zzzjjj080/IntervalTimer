@@ -174,6 +174,9 @@ final class Runner {
         keeperWork = Task {
             await previous?.value
             await keeper.start()
+            #if DEBUG
+            print("[Runner] keeper.mode = \(keeper.mode) / errors = \(keeper.errors)")
+            #endif
             switch keeper.mode {
             case .workout:
                 backgroundNote = nil
