@@ -8,20 +8,15 @@ struct SetupView: View {
     // 直近の設定は保存して、次に開いたときの初期値にする。
     @AppStorage("lastMinutes") private var minutes: Int = 20
     @AppStorage("lastParts") private var parts: Int = 4
-    @AppStorage("presets") private var presetsJSON: String = "{}"
 
     // Digital Crown は Double でしか回らないので、整数とは別に持つ。
     @State private var crownMinutes: Double = 20
     @State private var crownParts: Double = 4
 
-    @State private var showingSave = false
-    @State private var showingEdit = false
-
     @FocusState private var focus: Field?
     private enum Field: Hashable { case minutes, parts }
 
     private var config: TimerConfig { TimerConfig(minutes: minutes, parts: parts) }
-    private var book: PresetBook { PresetBook.decode(json: presetsJSON) }
 
     /// 上に空ける高さ。**ここにシステムの時計が出る。**
     ///
@@ -71,8 +66,6 @@ struct SetupView: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("start")
 
-                    presetSection
-
                     if let note = runner.backgroundNote {
                         Text(note)
                             .font(.system(size: 11))
@@ -91,36 +84,7 @@ struct SetupView: View {
             // 保存してある値をつまみ側にも入れておく。ここは素の代入で済ませる。
             crownMinutes = Double(minutes)
             crownParts = Double(parts)
-            openSheetForCheckingIfAsked()
         }
-        .sheet(isPresented: $showingSave) {
-            SavePresetSheet(config: config) { name in
-                var b = book
-                b.add(Preset(name: name, config: config))
-                presetsJSON = b.encodedJSON()
-            }
-        }
-        .sheet(isPresented: $showingEdit) {
-            EditPresetsSheet(book: book) { updated in
-                presetsJSON = updated.encodedJSON()
-            }
-        }
-    }
-
-    /// シートを開いた状態で起動するための入口。
-    ///
-    /// シミュレータへの合成タップはシートに届かないので（引き継ぎ書 4-24）、
-    /// ここを通さないと保存・整理の画面を一度も見られない。
-    ///
-    ///     SIMCTL_CHILD_IT_SHEET=save xcrun simctl launch <udid> com.zzzjjj080.IntervalTimer
-    private func openSheetForCheckingIfAsked() {
-        #if DEBUG
-        switch ProcessInfo.processInfo.environment["IT_SHEET"] {
-        case "save": showingSave = true
-        case "edit", "delete": showingEdit = true
-        default: break
-        }
-        #endif
     }
 
     // MARK: - 数値の行
@@ -212,66 +176,5 @@ struct SetupView: View {
         }
         .font(.system(size: 14))
         .frame(minHeight: 20)
-    }
-
-    // MARK: - プリセット
-
-    @ViewBuilder
-    private var presetSection: some View {
-        let b = book
-        if !b.presets.isEmpty {
-            VStack(spacing: 4) {
-                ForEach(b.presets) { preset in
-                    Button {
-                        minutes = preset.config.minutes
-                        parts = preset.config.parts
-                        crownMinutes = Double(preset.config.minutes)
-                        crownParts = Double(preset.config.parts)
-                        WKInterfaceDevice.current().play(.click)
-                    } label: {
-                        HStack {
-                            Text(preset.displayName)
-                                .font(.system(size: 14, weight: .medium))
-                                .lineLimit(1)
-                            Spacer(minLength: 4)
-                            Text("\(preset.config.minutes)分/\(preset.config.parts)")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Skin.normal.inkDim)
-                        }
-                        .foregroundStyle(Skin.normal.ink)
-                        .padding(.horizontal, 10)
-                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(Skin.normal.ink.opacity(0.08))
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("preset-\(preset.displayName)")
-                }
-            }
-            .padding(.top, 6)
-        }
-
-        HStack(spacing: 4) {
-            if !b.isFull {
-                textButton("保存") { showingSave = true }
-            }
-            if !b.presets.isEmpty {
-                // 消す操作は、読み込む行から離れた別の画面に置く。並べると必ず誤爆する。
-                textButton("整理") { showingEdit = true }
-            }
-        }
-        .padding(.top, 4)
-    }
-
-    private func textButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 13))
-                .foregroundStyle(Skin.normal.inkDim)
-                .frame(maxWidth: .infinity, minHeight: 44)
-        }
-        .buttonStyle(.plain)
     }
 }

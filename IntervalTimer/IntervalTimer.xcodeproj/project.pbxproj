@@ -7,15 +7,55 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A100000000000000000000E1 /* IntervalTimerWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A100000000000000000000E4 /* IntervalTimerWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A100000000000000000000B3 /* IntervalTimerCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000B2 /* IntervalTimerCore */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		A100000000000000000000E2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A100000000000000000000E8;
+			remoteInfo = IntervalTimerWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A100000000000000000000E7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A100000000000000000000E1 /* IntervalTimerWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A100000000000000000000E3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A100000000000000000000E8 /* IntervalTimerWidget */;
+			targetProxy = A100000000000000000000E2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXFileReference section */
+		A100000000000000000000E4 /* IntervalTimerWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = IntervalTimerWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A100000000000000000000E5 /* Widget-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Widget-Info.plist"; sourceTree = "<group>"; };
 		A10000000000000000000005 /* IntervalTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IntervalTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A100000000000000000000C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		A100000000000000000000E6 /* IntervalTimerWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = IntervalTimerWidget;
+			sourceTree = "<group>";
+		};
 		A10000000000000000000006 /* IntervalTimer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = IntervalTimer;
@@ -24,6 +64,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A100000000000000000000EA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A10000000000000000000008 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -39,7 +86,9 @@
 			isa = PBXGroup;
 			children = (
 				A100000000000000000000C1 /* Info.plist */,
+				A100000000000000000000E5 /* Widget-Info.plist */,
 				A10000000000000000000006 /* IntervalTimer */,
+				A100000000000000000000E6 /* IntervalTimerWidget */,
 				A10000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000005 /* IntervalTimer.app */,
+				A100000000000000000000E4 /* IntervalTimerWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -55,6 +105,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A100000000000000000000E8 /* IntervalTimerWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A100000000000000000000EC /* Build configuration list for PBXNativeTarget "IntervalTimerWidget" */;
+			buildPhases = (
+				A100000000000000000000E9 /* Sources */,
+				A100000000000000000000EA /* Frameworks */,
+				A100000000000000000000EB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A100000000000000000000E6 /* IntervalTimerWidget */,
+			);
+			name = IntervalTimerWidget;
+			packageProductDependencies = (
+			);
+			productName = IntervalTimerWidget;
+			productReference = A100000000000000000000E4 /* IntervalTimerWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		A10000000000000000000004 /* IntervalTimer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A100000000000000000000A4 /* Build configuration list for PBXNativeTarget "IntervalTimer" */;
@@ -62,10 +134,12 @@
 				A10000000000000000000007 /* Sources */,
 				A10000000000000000000008 /* Frameworks */,
 				A10000000000000000000009 /* Resources */,
+				A100000000000000000000E7 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A100000000000000000000E3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A10000000000000000000006 /* IntervalTimer */,
@@ -91,6 +165,9 @@
 					A10000000000000000000004 = {
 						CreatedOnToolsVersion = 26.6;
 					};
+					A100000000000000000000E8 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 				};
 			};
 			buildConfigurationList = A100000000000000000000A1 /* Build configuration list for PBXProject "IntervalTimer" */;
@@ -112,11 +189,19 @@
 			projectRoot = "";
 			targets = (
 				A10000000000000000000004 /* IntervalTimer */,
+				A100000000000000000000E8 /* IntervalTimerWidget */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A100000000000000000000EB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A10000000000000000000009 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -127,6 +212,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A100000000000000000000E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A10000000000000000000007 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -137,6 +229,66 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		A100000000000000000000ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A7WA598R44;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Widget-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "インターバル";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zzzjjj080.IntervalTimer.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer Widget watchOS Development";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		A100000000000000000000EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A7WA598R44;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Widget-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "インターバル";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zzzjjj080.IntervalTimer.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer Widget watchOS Development";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
 		A100000000000000000000A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -233,7 +385,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IntervalTimer/IntervalTimer.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer watchOS Development";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = A7WA598R44;
 				ENABLE_PREVIEWS = YES;
@@ -268,7 +422,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IntervalTimer/IntervalTimer.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer watchOS Development";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = A7WA598R44;
 				ENABLE_PREVIEWS = YES;
@@ -301,6 +457,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A100000000000000000000EC /* Build configuration list for PBXNativeTarget "IntervalTimerWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000000000000000000ED /* Debug */,
+				A100000000000000000000EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		A100000000000000000000A1 /* Build configuration list for PBXProject "IntervalTimer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

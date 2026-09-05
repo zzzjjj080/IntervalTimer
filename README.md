@@ -18,11 +18,13 @@ IntervalTimerCore/          UIに依存しないロジック。Xcodeを開かず
   Palette.swift             色の数値とコントラスト比
 IntervalTimer/              watchOS アプリ
   Info.plist                同期グループの外に置く（中に置くとビルドが必ず落ちる）
+  Widget-Info.plist         コンプリケーション用。NSExtension を実ファイルで書く
   IntervalTimer/
     Models/Runner.swift     画面とエンジンをつなぐ
     Services/               ハプティクス、HKWorkoutSession
     Views/                  設定・実行・終了
       Components/SegmentRing.swift  区切りぶんに分かれた円環
+  IntervalTimerWidget/      文字盤のコンプリケーション（押すとアプリが開く）
 prototype/index.html        挙動を決めたHTMLプロトタイプ
 SPEC.md                     実装仕様
 ```
@@ -81,6 +83,26 @@ SPEC.md                     実装仕様
 
 許可が取れなければ `WKExtendedRuntimeSession` へ落ち、その旨を画面に1行出す。
 失敗は握り潰さず、理由をそのまま画面に出す。
+
+## コンプリケーション
+
+文字盤から一発で開くための拡張。`IntervalTimerWidget/` にある。
+絵はアプリのアイコンと同じ4分割の円環。対応は circular / corner / inline / rectangular。
+
+**残り時間は出していない。** 出すにはアプリと拡張で状態を共有する必要があり（App Group）、
+仕掛けが増える。まずは「押すと開く」だけを確実に動かしている。
+
+- バンドルID: `com.zzzjjj080.IntervalTimer.Widget`
+  （**`.Complication` は Apple に "not available" で弾かれる**）
+- `Widget-Info.plist` は同期グループの外。`NSExtension` は `INFOPLIST_KEY_` に対応が無いので実ファイルで書く
+- **署名はプロジェクトにターゲットごとに書いてある。** 本体と拡張でバンドルIDが違うため、
+  `xcodebuild` のコマンドラインで `PROVISIONING_PROFILE_SPECIFIER` を一括指定すると拡張が必ず落ちる
+- プロファイルは2枚要る。`./Tools-MakeProfile.py` で作る
+
+## 設定の保存
+
+プリセットは作らない。**前回の値をそのまま次回の初期値にする**（`@AppStorage`）。
+枠を選ばせるより、開いたら前回のままになっているほうが速い。
 
 ## 確認
 
