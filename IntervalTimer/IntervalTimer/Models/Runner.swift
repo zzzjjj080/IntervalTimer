@@ -59,6 +59,7 @@ final class Runner {
     /// `backdated` を与えると、その秒数だけ前に始まったことにして実行画面へ入る。
     /// 動作確認で、警告や終了の状態をすぐ出すために使う。通常の開始は0。
     func start(config: TimerConfig, backdated: TimeInterval = 0) {
+        haptics.start()
         engine = TimerEngine(config: config, startedAt: Date().addingTimeInterval(-backdated))
         screen = .run
         refresh()
@@ -89,6 +90,7 @@ final class Runner {
     /// 終了画面の「もう一度」。同じ設定で最初から。
     func again() {
         guard var e = engine else { return }
+        haptics.start()
         e.restart(at: Date())
         engine = e
         screen = .run

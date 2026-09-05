@@ -99,7 +99,7 @@ struct SetupView: View {
                           value: Binding<Int>, crown: Binding<Double>,
                           range: ClosedRange<Int>) -> some View {
         HStack(spacing: 4) {
-            StepButton(systemName: "minus", tint: tint, width: stepWidth) {
+            StepButton(systemName: "minus", isUp: false, tint: tint, width: stepWidth) {
                 set(value, crown, to: value.wrappedValue - 1, in: range)
             }
             .accessibilityIdentifier("\(field)-minus")
@@ -144,7 +144,7 @@ struct SetupView: View {
                 if value.wrappedValue != rounded { value.wrappedValue = rounded }
             }
 
-            StepButton(systemName: "plus", tint: tint, width: stepWidth) {
+            StepButton(systemName: "plus", isUp: true, tint: tint, width: stepWidth) {
                 set(value, crown, to: value.wrappedValue + 1, in: range)
             }
             .accessibilityIdentifier("\(field)-plus")

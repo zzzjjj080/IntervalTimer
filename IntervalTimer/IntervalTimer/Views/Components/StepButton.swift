@@ -11,6 +11,8 @@ import IntervalTimerCore
 /// `minus.circle` のような細い記号は避け、太い `minus` / `plus` を使う。
 struct StepButton: View {
     let systemName: String
+    /// 増やす側か。触覚の向きを決める
+    let isUp: Bool
     let tint: Color
     let width: CGFloat
     let step: () -> Void
@@ -38,7 +40,7 @@ struct StepButton: View {
     private func begin() {
         end()
         step()
-        WKInterfaceDevice.current().play(.click)
+        Haptics.step(up: isUp)
 
         holding = Task { @MainActor in
             // 押した瞬間から走り出させない。1つだけ変えたいときに行き過ぎる
@@ -47,7 +49,7 @@ struct StepButton: View {
             while !Task.isCancelled {
                 step()
                 // 連続で鳴らすと震えっぱなしになる。速くなってからは間引く
-                if done % 4 == 0 { WKInterfaceDevice.current().play(.click) }
+                if done % 3 == 0 { Haptics.step(up: isUp) }
                 try? await Task.sleep(for: .seconds(HoldRepeat.interval(after: done)))
                 done += 1
             }
