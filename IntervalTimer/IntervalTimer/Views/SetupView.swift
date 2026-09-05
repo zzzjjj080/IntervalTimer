@@ -41,11 +41,11 @@ struct SetupView: View {
             // 外して自分で余白を決める（実行画面と同じ考え方）。
             ScrollView {
                 VStack(spacing: 4) {
-                    valueRow(label: "全体", unit: "分", field: .minutes,
+                    valueRow(label: "全体", unit: String(localized: "分"), field: .minutes,
                              value: $minutes, crown: $crownMinutes,
                              range: TimerConfig.minuteRange)
 
-                    valueRow(label: "分割", unit: "回", field: .parts,
+                    valueRow(label: "分割", unit: String(localized: "回"), field: .parts,
                              value: $parts, crown: $crownParts,
                              range: TimerConfig.partsRange)
 
@@ -90,7 +90,9 @@ struct SetupView: View {
 
     // MARK: - 数値の行
 
-    private func valueRow(label: String, unit: String, field: Field,
+    /// `unit` は**訳し終えた文字**で受ける。英語では単位が要らないので空文字になり、
+    /// そのときは何も描かない。空の `Text` を置くと、豆腐（□）が出る。
+    private func valueRow(label: LocalizedStringKey, unit: String, field: Field,
                           value: Binding<Int>, crown: Binding<Double>,
                           range: ClosedRange<Int>) -> some View {
         HStack(spacing: 4) {
@@ -110,9 +112,11 @@ struct SetupView: View {
                         .minimumScaleFactor(0.6)
                         .lineLimit(1)
                         .foregroundStyle(Skin.normal.ink)
-                    Text(unit)
-                        .font(.system(size: 11))
-                        .foregroundStyle(Skin.normal.inkDim)
+                    if !unit.isEmpty {
+                        Text(unit)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Skin.normal.inkDim)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 44)

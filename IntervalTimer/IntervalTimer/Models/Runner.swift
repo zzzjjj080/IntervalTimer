@@ -178,10 +178,10 @@ final class Runner {
             case .workout:
                 backgroundNote = nil
             case .extended:
-                backgroundNote = "予備の手段で動いています。連続で動ける時間に上限があります。"
+                backgroundNote = String(localized: "予備の手段で動いています。連続で動ける時間に上限があります。")
             case .none:
                 // 理由を消さずにそのまま出す。「押しても何も起きない」が一番たちが悪い。
-                backgroundNote = (keeper.firstError ?? "背面で動かせません。") + "画面を消すとタイマーが止まります。"
+                backgroundNote = (keeper.firstError ?? String(localized: "背面で動かせません。")) + String(localized: "画面を消すとタイマーが止まります。")
             }
         }
     }

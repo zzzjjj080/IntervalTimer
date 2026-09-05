@@ -1,0 +1,264 @@
+{
+  "sourceLanguage": "ja",
+  "strings": {
+    "全体": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Total"
+          }
+        }
+      },
+      "comment": "設定画面。タイマー全体の長さ"
+    },
+    "分": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "min"
+          }
+        }
+      },
+      "comment": "「全体 20 分」の単位"
+    },
+    "分割": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Splits"
+          }
+        }
+      },
+      "comment": "設定画面。いくつに区切るか"
+    },
+    "回": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ""
+          }
+        }
+      },
+      "comment": "「分割 4 回」の単位。英語では数字だけでよいので空にする"
+    },
+    "終わり": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ends"
+          }
+        }
+      },
+      "comment": "いま始めたら終わる時刻の見出し"
+    },
+    "開始": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        }
+      }
+    },
+    "一時停止": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        }
+      }
+    },
+    "再開": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume"
+          }
+        }
+      }
+    },
+    "リセット": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
+    "終了": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      },
+      "comment": "全体が終わったときの見出し"
+    },
+    "%lld分 / %lld区切り": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld min / %2$lld splits"
+          }
+        }
+      },
+      "comment": "終了画面。使った設定"
+    },
+    "もう一度": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Again"
+          }
+        }
+      },
+      "comment": "同じ設定でもう一度始める"
+    },
+    "設定に戻る": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        }
+      }
+    },
+    "予備の手段で動いています。連続で動ける時間に上限があります。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running on a fallback. It can only stay active for a limited time."
+          }
+        }
+      }
+    },
+    "背面で動かせません。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can't keep running in the background."
+          }
+        }
+      }
+    },
+    "画面を消すとタイマーが止まります。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The timer stops when the screen turns off."
+          }
+        }
+      }
+    },
+    "この端末ではヘルスケアが使えません。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health isn't available on this device."
+          }
+        }
+      }
+    },
+    "ヘルスケアの許可を確認できませんでした: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't check the Health permission: %@"
+          }
+        }
+      }
+    },
+    "ワークアウトの保存が許可されていません。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving workouts isn't allowed."
+          }
+        }
+      }
+    },
+    "ワークアウトを開始できませんでした: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't start the workout: %@"
+          }
+        }
+      }
+    },
+    "ワークアウトの保存に失敗しました: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't save the workout: %@"
+          }
+        }
+      }
+    },
+    "ワークアウトが外から止められました。画面を消すと計測が止まります。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The workout was stopped from elsewhere. Timing pauses when the screen turns off."
+          }
+        }
+      }
+    },
+    "ワークアウトが止まりました: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The workout stopped: %@"
+          }
+        }
+      }
+    },
+    "まもなく時間切れです。画面を点けたままにしてください。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time is almost up. Keep the screen on."
+          }
+        }
+      }
+    },
+    "予備の手段も使えませんでした: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The fallback failed too: %@"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

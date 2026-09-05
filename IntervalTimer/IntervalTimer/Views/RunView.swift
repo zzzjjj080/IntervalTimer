@@ -182,7 +182,9 @@ struct RunView: View {
 /// `tint` に色を渡すと、文字と枠にその色が付く。`nil` なら地の色に合わせた単色。
 /// 警告のときは地が琥珀一色になるので、そこへ緑や金を載せずに単色へ戻す。
 struct SmallButton: View {
-    let title: String
+    /// `String` のまま `Text` に渡すと**訳されない**（そのまま出る）。
+    /// 訳させたいものは必ず `LocalizedStringKey` で受ける。
+    let title: LocalizedStringKey
     let skin: Skin
     var tint: Color? = nil
     let action: () -> Void

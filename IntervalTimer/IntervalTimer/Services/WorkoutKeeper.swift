@@ -57,7 +57,7 @@ final class WorkoutKeeper: NSObject {
         isEnding = false
 
         guard HKHealthStore.isHealthDataAvailable() else {
-            errors.append("この端末ではヘルスケアが使えません。")
+            errors.append(String(localized: "この端末ではヘルスケアが使えません。"))
             startExtendedSession()
             return
         }
@@ -65,14 +65,14 @@ final class WorkoutKeeper: NSObject {
         do {
             try await store.requestAuthorization(toShare: shareTypes, read: readTypes)
         } catch {
-            errors.append("ヘルスケアの許可を確認できませんでした: \(error.localizedDescription)")
+            errors.append(String(localized: "ヘルスケアの許可を確認できませんでした: \(error.localizedDescription)"))
             startExtendedSession()
             return
         }
 
         // requestAuthorization は「拒否された」場合も成功で返る。状態を別に見る必要がある。
         guard store.authorizationStatus(for: HKObjectType.workoutType()) == .sharingAuthorized else {
-            errors.append("ワークアウトの保存が許可されていません。")
+            errors.append(String(localized: "ワークアウトの保存が許可されていません。"))
             startExtendedSession()
             return
         }
@@ -95,7 +95,7 @@ final class WorkoutKeeper: NSObject {
             self.builder = builder
             self.mode = .workout
         } catch {
-            errors.append("ワークアウトを開始できませんでした: \(error.localizedDescription)")
+            errors.append(String(localized: "ワークアウトを開始できませんでした: \(error.localizedDescription)"))
             startExtendedSession()
         }
     }
@@ -121,7 +121,7 @@ final class WorkoutKeeper: NSObject {
                 try await builder.endCollection(at: now)
                 _ = try await builder.finishWorkout()
             } catch {
-                errors.append("ワークアウトの保存に失敗しました: \(error.localizedDescription)")
+                errors.append(String(localized: "ワークアウトの保存に失敗しました: \(error.localizedDescription)"))
             }
         }
         session = nil
@@ -150,7 +150,7 @@ extension WorkoutKeeper: HKWorkoutSessionDelegate {
             // 自分で終わらせているなら、これは想定どおりの通知。エラーにしない。
             guard !self.isEnding else { return }
             if self.mode == .workout, self.session != nil {
-                self.errors.append("ワークアウトが外から止められました。画面を消すと計測が止まります。")
+                self.errors.append(String(localized: "ワークアウトが外から止められました。画面を消すと計測が止まります。"))
                 self.mode = .none
             }
         }
@@ -158,7 +158,7 @@ extension WorkoutKeeper: HKWorkoutSessionDelegate {
 
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: any Error) {
         Task { @MainActor in
-            self.errors.append("ワークアウトが止まりました: \(error.localizedDescription)")
+            self.errors.append(String(localized: "ワークアウトが止まりました: \(error.localizedDescription)"))
             self.mode = .none
         }
     }
@@ -172,7 +172,7 @@ extension WorkoutKeeper: WKExtendedRuntimeSessionDelegate {
 
     nonisolated func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
         Task { @MainActor in
-            self.errors.append("まもなく時間切れです。画面を点けたままにしてください。")
+            self.errors.append(String(localized: "まもなく時間切れです。画面を点けたままにしてください。"))
         }
     }
 
@@ -183,7 +183,7 @@ extension WorkoutKeeper: WKExtendedRuntimeSessionDelegate {
     ) {
         Task { @MainActor in
             if let error {
-                self.errors.append("予備の手段も使えませんでした: \(error.localizedDescription)")
+                self.errors.append(String(localized: "予備の手段も使えませんでした: \(error.localizedDescription)"))
             }
             if self.mode == .extended { self.mode = .none }
         }

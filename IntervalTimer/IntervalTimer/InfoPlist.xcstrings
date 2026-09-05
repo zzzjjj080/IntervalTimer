@@ -1,0 +1,37 @@
+{
+  "sourceLanguage": "ja",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "ホーム画面と文字盤に出る名前。英語圏では「インターバル」が読めないので別名",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Splits"
+          }
+        }
+      }
+    },
+    "NSHealthShareUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your practice is recorded as a workout so the timer keeps running while your wrist is down and the screen is off. Heart rate and active energy are used only for that, and are never sent anywhere."
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your practice is saved to Health as a workout. Saving it is what lets the timer keep running while the screen is off."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

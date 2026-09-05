@@ -4,6 +4,9 @@ import Testing
 
 struct TimeTextTests {
 
+    private let ja = Locale(identifier: "ja_JP")
+
+
     @Test func 切り上げで出す() {
         #expect(TimeText.clock(300) == "5:00")
         #expect(TimeText.clock(299.99) == "5:00")   // まだ5分と言ってよい
@@ -48,21 +51,31 @@ struct TimeTextTests {
         #expect(TimeText.clock(1200.0 - 0.0) == "20:00")
     }
 
+    @Test func 英語では単位が英語になる() {
+        let en = Locale(identifier: "en_US")
+        #expect(TimeText.brief(47, locale: en) == "47s")
+        #expect(TimeText.brief(300, locale: en) == "5m")
+        #expect(TimeText.brief(140, locale: en) == "2m20s")
+        #expect(TimeText.japanese(300, locale: en) == "5m00s")
+        // 時計の表記は言語に依らない
+        #expect(TimeText.clock(300) == "5:00")
+    }
+
     @Test func 短い表記はぴったりなら秒を出さない() {
-        #expect(TimeText.brief(60) == "1分")
-        #expect(TimeText.brief(300) == "5分")
-        #expect(TimeText.brief(47) == "47秒")
-        #expect(TimeText.brief(140) == "2分20秒")
-        #expect(TimeText.brief(0) == "0秒")
+        #expect(TimeText.brief(60, locale: ja) == "1分")
+        #expect(TimeText.brief(300, locale: ja) == "5分")
+        #expect(TimeText.brief(47, locale: ja) == "47秒")
+        #expect(TimeText.brief(140, locale: ja) == "2分20秒")
+        #expect(TimeText.brief(0, locale: ja) == "0秒")
         // 20分を12分割すると100秒。1分40秒
-        #expect(TimeText.brief(100) == "1分40秒")
+        #expect(TimeText.brief(100, locale: ja) == "1分40秒")
     }
 
     @Test func プレビューの日本語表記() {
-        #expect(TimeText.japanese(300) == "5分00秒")
-        #expect(TimeText.japanese(140) == "2分20秒")
-        #expect(TimeText.japanese(5) == "5秒")
-        #expect(TimeText.japanese(60) == "1分00秒")
-        #expect(TimeText.japanese(TimerConfig(minutes: 7, parts: 3).splitSeconds) == "2分20秒")
+        #expect(TimeText.japanese(300, locale: ja) == "5分00秒")
+        #expect(TimeText.japanese(140, locale: ja) == "2分20秒")
+        #expect(TimeText.japanese(5, locale: ja) == "5秒")
+        #expect(TimeText.japanese(60, locale: ja) == "1分00秒")
+        #expect(TimeText.japanese(TimerConfig(minutes: 7, parts: 3).splitSeconds, locale: ja) == "2分20秒")
     }
 }

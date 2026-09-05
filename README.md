@@ -148,6 +148,30 @@ SPEC.md                     実装仕様
 プリセットは作らない。**前回の値をそのまま次回の初期値にする**（`@AppStorage`）。
 枠を選ばせるより、開いたら前回のままになっているほうが速い。
 
+## 日本語と英語
+
+`Localizable.xcstrings` / `InfoPlist.xcstrings`（アプリ）と、
+`IntervalTimerWidget/Localizable.xcstrings`（コンプリケーション）。
+元の言語は日本語で、キーは日本語そのもの。
+
+**気をつけるところが3つある。**
+
+1. **`Text(String)` は訳されない。** そのまま出る。訳させたいものは `LocalizedStringKey` で受ける。
+   `SmallButton(title:)` と `valueRow(label:)` はこれで一度取りこぼした
+2. **訳が空文字だと豆腐（□）が出る。** 英語では「回」に当たる単位が要らないので空にしたが、
+   空の `Text` を置くと四角が描かれる。**空なら描かない**分岐が要る
+3. **単位つきの数字は String Catalog では拾えない。**（`5分00秒` `47秒`）
+   訳文に単位を混ぜると英語版に「分」が残る。`TimeText` が `Locale` を見て組み立てる
+
+`String` を返すところ（ワークアウトのエラー文）は `String(localized:)` で包む。
+
+```bash
+# 英語で起動して確かめる
+xcrun simctl launch "$W" com.zzzjjj080.IntervalTimer -AppleLanguages "(en)"
+```
+
+**英語の名前は `Splits`（仮）。** ストア名は別に決める。
+
 ## 確認
 
 **シミュレータは1台だけ起動する。** 複数起動していると `booted` が別の端末に飛ぶ。

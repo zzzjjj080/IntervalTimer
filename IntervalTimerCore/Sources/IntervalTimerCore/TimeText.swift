@@ -28,20 +28,31 @@ public enum TimeText {
         return String(format: "%d:%02d", s / 60, sec)
     }
 
-    /// `1分` `47秒` `2分20秒`。**ぴったりなら秒を出さない。**
-    /// 設定画面で「1区切りの長さ」を短く見せるのに使う。
-    public static func brief(_ seconds: Double) -> String {
+    /// `1分` `47秒` `2分20秒` / 英語なら `1m` `47s` `2m20s`。
+    ///
+    /// **ぴったりなら秒を出さない。**
+    ///
+    /// 数字の書式は String Catalog では拾えない。訳文の中に単位を混ぜると、
+    /// 英語版に「分」が残る。**ここで言語ごとに組み立てる。**
+    public static func brief(_ seconds: Double, locale: Locale = .current) -> String {
         let s = Int(ceil(max(0, seconds) - epsilon))
         let m = s / 60, sec = s % 60
-        if m == 0 { return "\(sec)秒" }
-        if sec == 0 { return "\(m)分" }
-        return "\(m)分\(sec)秒"
+        let (mu, su) = units(for: locale)
+        if m == 0 { return "\(sec)\(su)" }
+        if sec == 0 { return "\(m)\(mu)" }
+        return "\(m)\(mu)\(sec)\(su)"
     }
 
-    /// `5分00秒`。
-    public static func japanese(_ seconds: Double) -> String {
+    /// 分と秒の単位。日本語だけ全角の漢字、それ以外は英語の略記。
+    private static func units(for locale: Locale) -> (String, String) {
+        locale.language.languageCode == .japanese ? ("分", "秒") : ("m", "s")
+    }
+
+    /// `5分00秒` / 英語なら `5m00s`。設定画面で1区切りの長さを丁寧に見せるとき用。
+    public static func japanese(_ seconds: Double, locale: Locale = .current) -> String {
         let s = Int(ceil(max(0, seconds) - epsilon))
         let m = s / 60, sec = s % 60
-        return m > 0 ? "\(m)分\(String(format: "%02d", sec))秒" : "\(sec)秒"
+        let (mu, su) = units(for: locale)
+        return m > 0 ? "\(m)\(mu)\(String(format: "%02d", sec))\(su)" : "\(sec)\(su)"
     }
 }
