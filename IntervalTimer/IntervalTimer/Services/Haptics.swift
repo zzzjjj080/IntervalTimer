@@ -8,8 +8,8 @@ import IntervalTimerCore
 ///
 /// | 場面 | 触覚 | ねらい |
 /// |---|---|---|
-/// | ＋ を押した | `.directionUp` | 増えたことが向きで分かる |
-/// | − を押した | `.directionDown` | 減ったことが向きで分かる |
+/// | ＋ を押した | `.start` | 合図より弱く。＋と−で手応えを変える |
+/// | − を押した | `.stop` | 同上 |
 /// | 開始 | `.start` ＋ `.notification` | 走り出した手応え |
 /// | 区切りの75% | `.notification` ×4 | 練習中の腕でも気づける強さ |
 /// | 区切りが0 | 同じ ×4 | 途中と終わりは同じでよい |
@@ -52,10 +52,15 @@ final class Haptics {
 
     // MARK: - 操作の手応え
 
-    /// 数字を1つ動かした。向きが分かる触覚にしてある。
-    /// `.click` だと弱くて、手袋越しでは分からない。
+    /// 数字を1つ動かした。
+    ///
+    /// **合図より弱くする。** 数字合わせは何十回も押すので、区切りの合図と同じ強さだと疲れる。
+    /// `.click` は弱すぎて手袋越しでは分からず、`.directionUp` / `.directionDown` は強すぎた。
+    /// `.start` / `.stop` はその中間で、しかも**＋と−で手応えが違う**。
+    ///
+    /// さらに弱くするなら `.click`。強くするなら `.directionUp` / `.directionDown`。
     static func step(up: Bool) {
-        WKInterfaceDevice.current().play(up ? .directionUp : .directionDown)
+        WKInterfaceDevice.current().play(up ? .start : .stop)
     }
 
     /// 走り出した。押した実感が要るので2つ重ねる。
