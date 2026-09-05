@@ -144,7 +144,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Running on a fallback. It can only stay active for a limited time."
+            "value": "Running in backup mode. It can only stay active for a limited time."
           }
         }
       }
@@ -194,7 +194,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saving workouts isn't allowed."
+            "value": "Permission to save workouts wasn't granted."
           }
         }
       }
@@ -224,7 +224,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The workout was stopped from elsewhere. Timing pauses when the screen turns off."
+            "value": "The workout ended. Timing will pause when the screen turns off."
           }
         }
       }
@@ -254,7 +254,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The fallback failed too: %@"
+            "value": "The backup method didn't work either: %@"
           }
         }
       }
