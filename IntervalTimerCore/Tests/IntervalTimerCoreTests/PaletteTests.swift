@@ -44,6 +44,16 @@ struct PaletteTests {
         #expect(Contrast.ratio(PaletteHex.accent, PaletteHex.background) >= 4.5)
     }
 
+    @Test func ボタンの色も読める() {
+        // ボタンの文字は小さいので本文の基準（4.5:1）。
+        #expect(Contrast.ratio(PaletteHex.goInk, PaletteHex.background) >= 4.5)
+        #expect(Contrast.ratio(PaletteHex.stopInk, PaletteHex.background) >= 4.5)
+        // 「開始」は塗りつぶしなので、塗りと文字の間で測る。
+        #expect(Contrast.ratio(PaletteHex.warnInk, PaletteHex.startFill) >= 4.5)
+        // 「開始」の塗りは地の色からはっきり浮くこと。
+        #expect(Contrast.ratio(PaletteHex.startFill, PaletteHex.background) >= 3.0)
+    }
+
     @Test func 分割数ぶんの色を端から端まで使う() {
         #expect(PaletteHex.segments(parts: 1) == [PaletteHex.segmentRamp.last!])
         for n in 2...12 {

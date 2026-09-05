@@ -46,6 +46,18 @@ enum Skin {
 
     /// 設定画面で数字に添える暖色。
     var accent: Color { self == .normal ? Color(hex: PaletteHex.accent) : ink }
+
+    /// ボタンの色。
+    ///
+    /// **警告と終了のときは `nil` にして単色へ戻す。** あの2つは地の色が合図なので、
+    /// その上にさらに色を置くと、何が起きたのか読み取れなくなる。
+    /// 実行画面のボタンは、通常のときと警告のときで同じ場所に出るので、
+    /// どちらの地の上でも読めることが要る。
+    var goTint: Color? { self == .normal ? Color(hex: PaletteHex.goInk) : nil }
+    var stopTint: Color? { self == .normal ? Color(hex: PaletteHex.stopInk) : nil }
+
+    /// 増減ボタン。押せる場所だと分かればよいので、控えめに。
+    var stepTint: Color { self == .normal ? Color(hex: PaletteHex.goInk) : ink }
 }
 
 extension Color {

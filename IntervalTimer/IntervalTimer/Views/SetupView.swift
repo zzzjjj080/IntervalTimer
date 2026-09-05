@@ -56,11 +56,12 @@ struct SetupView: View {
                     } label: {
                         Text("開始")
                             .font(.system(size: 17, weight: .bold))
-                            .foregroundStyle(Skin.normal.background)
+                            // 塗りが橙なので、文字は白ではなくほぼ黒。こちらのほうが読める
+                            .foregroundStyle(Color(hex: PaletteHex.warnInk))
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .background(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(Skin.normal.ink)
+                                    .fill(Color(hex: PaletteHex.startFill))
                             )
                     }
                     .buttonStyle(.plain)
@@ -146,11 +147,11 @@ struct SetupView: View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(Skin.normal.ink)
+                .foregroundStyle(Skin.normal.stepTint)
                 .frame(width: stepWidth, height: 44)
                 .background(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(Skin.normal.ink.opacity(0.12))
+                        .fill(Skin.normal.stepTint.opacity(0.16))
                 )
         }
         .buttonStyle(.plain)

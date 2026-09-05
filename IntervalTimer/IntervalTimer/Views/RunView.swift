@@ -75,11 +75,13 @@ struct RunView: View {
             }
 
             HStack(spacing: 6) {
-                SmallButton(title: d.isPaused ? "再開" : "一時停止", skin: skin) {
+                SmallButton(title: d.isPaused ? "再開" : "一時停止",
+                            skin: skin, tint: skin.goTint) {
                     runner.pauseOrResume()
                 }
                 .accessibilityIdentifier("pause")
-                SmallButton(title: "リセット", skin: skin) {
+                SmallButton(title: "リセット",
+                            skin: skin, tint: skin.stopTint) {
                     runner.reset()
                 }
                 .accessibilityIdentifier("reset")
@@ -176,21 +178,27 @@ struct RunView: View {
 }
 
 /// 実行画面の下に並べる小さいボタン。指1本ぶん（44pt）は確保する。
+///
+/// `tint` に色を渡すと、文字と枠にその色が付く。`nil` なら地の色に合わせた単色。
+/// 警告のときは地が琥珀一色になるので、そこへ緑や金を載せずに単色へ戻す。
 struct SmallButton: View {
     let title: String
     let skin: Skin
+    var tint: Color? = nil
     let action: () -> Void
+
+    private var face: Color { tint ?? skin.ink }
 
     var body: some View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 14, weight: .semibold))
                 // Button は中の文字色を勝手に上書きするので、自分で指定し直す。
-                .foregroundStyle(skin.ink)
+                .foregroundStyle(face)
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(skin.ink.opacity(0.15))
+                        .fill(face.opacity(0.16))
                 )
         }
         .buttonStyle(.plain)
