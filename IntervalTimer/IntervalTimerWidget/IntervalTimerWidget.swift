@@ -3,9 +3,6 @@ import WidgetKit
 
 /// 文字盤に置いて、一発でアプリを開くためのコンプリケーション。
 ///
-/// 絵はアプリのアイコンと同じ「4分割された円環」。
-/// 文字盤には小さく出るので、名前ではなく形で見つけられるほうがいい。
-///
 /// **残り時間は出していない。** 出すにはアプリと拡張で状態を共有する必要があり
 /// （App Group）、仕掛けが増える。まずは「押すと開く」だけを確実に動かす。
 @main
@@ -17,9 +14,6 @@ struct LaunchComplication: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "IntervalTimerLaunch", provider: LaunchProvider()) { _ in
             ComplicationView()
-                // **watchOS 10 以降はこれが必須。**
-                // 付けないとコンプリケーションが描画されず、丸にビックリマークになる。
-                .containerBackground(for: .widget) { AccessoryWidgetBackground() }
         }
         .configurationDisplayName("インターバル")
         .description("タップしてタイマーを開きます。")
@@ -46,8 +40,31 @@ struct LaunchProvider: TimelineProvider {
 
 struct ComplicationView: View {
     @Environment(\.widgetFamily) private var family
+    @Environment(\.widgetRenderingMode) private var mode
 
     var body: some View {
+        content
+            // **watchOS 10 以降はこれが必須。**
+            // 付けないとコンプリケーションが描画されず、丸にビックリマークになる。
+            .containerBackground(for: .widget) { background }
+    }
+
+    /// 地の色。
+    ///
+    /// 色を出せる文字盤ではアプリと同じ濃いティール。**地を置くのが肝で、**
+    /// これが無いと明るい文字盤や写真の上で輪が埋もれる（地なしの案を実寸で試して確認した）。
+    /// 単色に着色される文字盤では、システム標準の地に任せる。
+    @ViewBuilder
+    private var background: some View {
+        if mode == .fullColor {
+            Palette.ground
+        } else {
+            AccessoryWidgetBackground()
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         switch family {
         case .accessoryInline:
             // インラインは1行の文字だけ。図は出せない。
@@ -62,40 +79,61 @@ struct ComplicationView: View {
                 Spacer(minLength: 0)
             }
         case .accessoryCorner:
-            SplitRing(lineWidth: 5)
-                .widgetLabel("インターバル")
+            SplitRing(lineWidth: 5).widgetLabel("インターバル")
         default:
-            SplitRing(lineWidth: 5).padding(2)
+            SplitRing(lineWidth: 6).padding(3)
         }
     }
 }
 
-/// 4分割された円環。アイコンと同じ絵。
+enum Palette {
+    /// アプリと同じ地の色。
+    static let ground = Color(red: 0x0F/255, green: 0x32/255, blue: 0x39/255)
+
+    /// 12時から時計回りに4本ぶん。**明るさを揃えず、はっきり変える。**
+    /// 文字盤は明るいものも暗いものもあるので、どちらの上でも4本が見分けられる必要がある。
+    static let arcs: [Color] = [
+        Color(red: 0xD9/255, green: 0x6A/255, blue: 0x0B/255),   // 琥珀（アプリの警告色）
+        Color(red: 0xE8/255, green: 0xC0/255, blue: 0x4A/255),   // 金
+        Color(red: 0x4E/255, green: 0xC3/255, blue: 0xAE/255),   // 若緑
+        Color(red: 0x9E/255, green: 0xD9/255, blue: 0xE0/255),   // 淡い水
+    ]
+}
+
+/// 4分割された円環。
 ///
 /// **`GeometryReader` を使わない。** コンプリケーションの枠は極端に小さく、
 /// 測らせると 0 や NaN が返ってきて描画ごと落ちることがある。
 /// `Shape` は与えられた矩形をそのまま受け取るので、測る必要がない。
-///
-/// 文字盤では単色に着色されるので、色相では区別できない。
-/// 1本だけ濃く、残りを薄くして、**濃さ**で「いま1つ目」を表す。
 struct SplitRing: View {
-    var lineWidth: CGFloat = 5
+    @Environment(\.widgetRenderingMode) private var mode
+    var lineWidth: CGFloat = 6
 
     var body: some View {
         ZStack {
-            SplitArcs(accent: false, lineWidth: lineWidth)
-                .stroke(style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
-                .opacity(0.3)
-            SplitArcs(accent: true, lineWidth: lineWidth)
-                .stroke(style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+            if mode == .fullColor {
+                // 色を出せる文字盤では4色。押す前から「あのアプリだ」と分かる
+                ForEach(0..<4, id: \.self) { i in
+                    SplitArcs(only: i, lineWidth: lineWidth)
+                        .stroke(Palette.arcs[i],
+                                style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                }
+            } else {
+                // 単色に着色される文字盤では、色相では区別できない。濃さで分ける
+                SplitArcs(only: nil, lineWidth: lineWidth)
+                    .stroke(style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                    .opacity(0.3)
+                SplitArcs(only: 0, lineWidth: lineWidth)
+                    .stroke(style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                    .widgetAccentable()
+            }
         }
-        .widgetAccentable()
     }
 }
 
-/// 4分割の弧。`accent` が true なら1本目だけ、false なら残り3本を描く。
+/// 4分割の弧。`only` にその番号だけ、`nil` なら1本目以外を描く。
 private struct SplitArcs: Shape {
-    let accent: Bool
+    let only: Int?
     let lineWidth: CGFloat
     private let parts = 4
 
@@ -111,7 +149,7 @@ private struct SplitArcs: Shape {
         let span = max(step * 0.2, step - (8 + cap * 2))
 
         var p = Path()
-        for i in 0..<parts where (i == 0) == accent {
+        for i in 0..<parts where (only == nil ? i != 0 : i == only) {
             let start = -90.0 + Double(i) * step + (step - span) / 2
             p.addArc(center: center, radius: radius,
                      startAngle: .degrees(start),

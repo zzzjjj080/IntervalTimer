@@ -92,6 +92,15 @@ SPEC.md                     実装仕様
 **残り時間は出していない。** 出すにはアプリと拡張で状態を共有する必要があり（App Group）、
 仕掛けが増える。まずは「押すと開く」だけを確実に動かしている。
 
+配色は `widgetRenderingMode` で分ける。
+
+- **色を出せる文字盤（`.fullColor`）**: 濃いティールの地に、琥珀→金→若緑→淡い水の4色
+- **単色に着色される文字盤（`.accented` / `.vibrant`）**: 色相では区別できないので、
+  1本目だけ `widgetAccentable()`、残りは薄く。**濃さ**で分ける
+
+**地を置くのが肝。** 地なしで白い輪にすると、明るい文字盤や写真の上で埋もれる。
+実寸50ptで地あり／地なしを並べて確認した。
+
 - バンドルID: `com.zzzjjj080.IntervalTimer.Widget`
   （**`.Complication` は Apple に "not available" で弾かれる**）
 - `Widget-Info.plist` は同期グループの外。`NSExtension` は `INFOPLIST_KEY_` に対応が無いので実ファイルで書く
