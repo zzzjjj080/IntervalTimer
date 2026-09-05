@@ -5,14 +5,17 @@ struct RootView: View {
     @Environment(Runner.self) private var runner
 
     var body: some View {
-        Group {
-            switch runner.screen {
-            case .setup: SetupView()
-            case .run:   RunView()
-            case .done:  DoneView()
-            }
+        screens
+            .task { startForCheckingIfAsked() }
+    }
+
+    @ViewBuilder
+    private var screens: some View {
+        switch runner.screen {
+        case .setup: SetupView()
+        case .run:   RunView()
+        case .done:  DoneView()
         }
-        .task { startForCheckingIfAsked() }
     }
 
     /// シミュレータでの動作確認用の入口。
