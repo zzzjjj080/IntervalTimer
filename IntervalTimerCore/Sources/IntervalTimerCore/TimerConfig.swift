@@ -35,14 +35,17 @@ public struct TimerConfig: Equatable, Hashable, Codable, Sendable {
         totalSeconds * Double(i.clamped(to: 0...parts)) / Double(parts)
     }
 
-    /// 20%通知を出すかどうか。
+    /// 区切りの途中の合図を出すかどうか。
     ///
-    /// 区切りが短いと「残り20%」が一瞬で過ぎてしまい、振動の意味がなくなる。
-    /// 仕様どおり、区切りの長さ×0.2 が2秒未満なら出さない。
+    /// 区切りが短いと合図が一瞬で過ぎてしまい、振動の意味がなくなる。
+    /// 残りぶんが2秒未満になる設定では出さない。
     public var givesWarning: Bool { splitSeconds * Self.warningRatio >= 2.0 }
 
-    /// 「残りこの割合以下で警告」。
-    public static let warningRatio = 0.2
+    /// 区切りの**75%が終わった**ところで合図を出す。つまり「残りこの割合」。
+    ///
+    /// 練習中は「そろそろ終わる」を先に知りたいので、区切りの終わりと同じ強さで鳴らす。
+    /// 弱い合図だと、動いている最中は気づけない。
+    public static let warningRatio = 0.25
 
     // MARK: - 保存からの読み出し
 

@@ -46,7 +46,7 @@ struct EngineTests {
         let log = run(&engine, from: base, seconds: 1200)
 
         let warnings = log.filter { $0.event == .warning }.map(\.at)
-        #expect(warnings == [240, 540, 840, 1140])   // 各区切りの残り1分（＝20%）
+        #expect(warnings == [225, 525, 825, 1125])   // 各区切りの75%が終わったところ
 
         let splits = log.compactMap { entry -> Double? in
             if case .splitEnded = entry.event { return entry.at } else { return nil }
@@ -65,10 +65,10 @@ struct EngineTests {
         }
     }
 
-    @Test func 二十パーセントの瞬間に警告の色になり0で戻る() {
+    @Test func 七十五パーセントの瞬間に色が変わり0で戻る() {
         let engine = TimerEngine(config: TimerConfig(minutes: 20, parts: 4), startedAt: base)
-        #expect(engine.snapshot(at: base.addingTimeInterval(239.9)).isWarning == false)
-        #expect(engine.snapshot(at: base.addingTimeInterval(240.0)).isWarning == true)
+        #expect(engine.snapshot(at: base.addingTimeInterval(224.9)).isWarning == false)
+        #expect(engine.snapshot(at: base.addingTimeInterval(225.0)).isWarning == true)
         #expect(engine.snapshot(at: base.addingTimeInterval(299.9)).isWarning == true)
         #expect(engine.snapshot(at: base.addingTimeInterval(300.0)).isWarning == false)   // 次の区切りへ
     }
@@ -133,7 +133,7 @@ struct EngineTests {
         #expect(s.displayIndex == 1)
         #expect(TimeText.clock(s.totalRemaining) == "20:00")
         // 20%通知のフラグも戻っているので、また鳴る
-        #expect(engine.advance(to: again.addingTimeInterval(240)).contains(.warning))
+        #expect(engine.advance(to: again.addingTimeInterval(225)).contains(.warning))
     }
 
     // MARK: - 9. 割り切れない設定
@@ -184,14 +184,14 @@ struct EngineTests {
         let log = run(&engine, from: base, seconds: 300)
         // 途中の切れ目は無い。20%（残り1分）の警告と、終了だけ。
         #expect(log.filter { if case .splitEnded = $0.event { return true } else { return false } }.isEmpty)
-        #expect(log.filter { $0.event == .warning }.map(\.at) == [240])
+        #expect(log.filter { $0.event == .warning }.map(\.at) == [225])
         #expect(log.filter { $0.event == .finished }.map(\.at) == [300])
     }
 
     // MARK: - 11. 短すぎる区切りでは20%通知を出さない
 
-    @Test func 一分十二分割では二十パーセント通知が出ない() {
-        let config = TimerConfig(minutes: 1, parts: 12)   // 1区切り5秒 → 20%は1秒
+    @Test func 一分十二分割では途中の合図が出ない() {
+        let config = TimerConfig(minutes: 1, parts: 12)   // 1区切り5秒 → 残り25%は1.25秒
         #expect(config.givesWarning == false)
 
         var engine = TimerEngine(config: config, startedAt: base)
@@ -203,11 +203,11 @@ struct EngineTests {
         #expect(log.filter { $0.event == .finished }.count == 1)
     }
 
-    @Test func 二十パーセントが二秒ちょうどなら通知は出る() {
-        // 1区切り10秒 → 20%は2.0秒。「2秒未満なら出さない」なので、これは出る側。
-        #expect(TimerConfig(minutes: 2, parts: 12).givesWarning == true)   // 120秒/12 = 10秒
-        #expect(TimerConfig(minutes: 1, parts: 6).givesWarning == true)    // 60秒/6 = 10秒
-        #expect(TimerConfig(minutes: 1, parts: 7).givesWarning == false)   // 60秒/7 ≒ 8.6秒
+    @Test func 残りが二秒ちょうどなら合図は出る() {
+        // 「残りぶんが2秒未満なら出さない」。区切り8秒がちょうど境目（8×0.25 = 2.0）。
+        #expect(TimerConfig(minutes: 2, parts: 12).givesWarning == true)   // 120秒/12 = 10秒 → 2.5秒
+        #expect(TimerConfig(minutes: 1, parts: 7).givesWarning == true)    // 60秒/7 ≒ 8.6秒 → 2.1秒
+        #expect(TimerConfig(minutes: 1, parts: 8).givesWarning == false)   // 60秒/8 = 7.5秒 → 1.9秒
     }
 
     // MARK: - 範囲

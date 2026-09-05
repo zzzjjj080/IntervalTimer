@@ -23,12 +23,29 @@ struct SetupView: View {
     private var config: TimerConfig { TimerConfig(minutes: minutes, parts: parts) }
     private var book: PresetBook { PresetBook.decode(json: presetsJSON) }
 
+    /// 上に空ける高さ。**ここにシステムの時計が出る。**
+    ///
+    /// 実行画面の円環は角が丸いので18ptで足りたが、この画面は右上に四角い「＋」が来るので、
+    /// 時計と正面衝突する。画面の高さに比例させて、機種が変わっても当たらないようにする。
+    private var clockReserve: CGFloat {
+        WKInterfaceDevice.current().screenBounds.height * 0.13
+    }
+
+    /// ＋ − ボタンの幅。**数値のセルより、押しやすさを優先する。**
+    /// グローブでも外さずに押せることのほうが、180という数字が大きく出ることより大事。
+    private var stepWidth: CGFloat {
+        let w = WKInterfaceDevice.current().screenBounds.width
+        return max(40, min(58, w * 0.27))
+    }
+
     var body: some View {
         ZStack {
             Skin.normal.background.ignoresSafeArea()
 
+            // 安全領域に任せると高さが3分の1近く削られ、開始ボタンが画面の外へ出る。
+            // 外して自分で余白を決める（実行画面と同じ考え方）。
             ScrollView {
-                VStack(spacing: 8) {
+                VStack(spacing: 4) {
                     valueRow(label: "全体", unit: "分", field: .minutes,
                              value: $minutes, crown: $crownMinutes,
                              range: TimerConfig.minuteRange)
@@ -38,7 +55,6 @@ struct SetupView: View {
                              range: TimerConfig.partsRange)
 
                     preview
-                        .padding(.top, 2)
 
                     Button {
                         runner.start(config: config)
@@ -54,7 +70,6 @@ struct SetupView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("start")
-                    .padding(.top, 2)
 
                     presetSection
 
@@ -66,10 +81,12 @@ struct SetupView: View {
                             .padding(.top, 6)
                     }
                 }
-                .padding(.horizontal, 4)
-                .padding(.vertical, 4)
+                .padding(.horizontal, 6)
+                .padding(.bottom, 6)
             }
+            .padding(.top, clockReserve)
         }
+        .ignoresSafeArea()
         .onAppear {
             // 保存してある値をつまみ側にも入れておく。ここは素の代入で済ませる。
             crownMinutes = Double(minutes)
@@ -111,7 +128,7 @@ struct SetupView: View {
     private func valueRow(label: String, unit: String, field: Field,
                           value: Binding<Int>, crown: Binding<Double>,
                           range: ClosedRange<Int>) -> some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 4) {
             stepButton(systemName: "minus") {
                 set(value, crown, to: value.wrappedValue - 1, in: range)
             }
@@ -123,8 +140,10 @@ struct SetupView: View {
                     .foregroundStyle(Skin.normal.inkDim)
                 HStack(alignment: .firstTextBaseline, spacing: 1) {
                     Text("\(value.wrappedValue)")
-                        .font(.system(size: 28, weight: .heavy, design: .rounded))
+                        .font(.system(size: 27, weight: .heavy, design: .rounded))
                         .monospacedDigit()
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
                         .foregroundStyle(Skin.normal.ink)
                     Text(unit)
                         .font(.system(size: 11))
@@ -158,13 +177,13 @@ struct SetupView: View {
         }
     }
 
-    /// グローブでも押せるよう44pt。`minus.circle` のような細い記号は避ける。
+    /// グローブでも押せるよう、高さ44pt・幅は画面の27%。`minus.circle` のような細い記号は避ける。
     private func stepButton(systemName: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(Skin.normal.ink)
-                .frame(width: 40, height: 44)
+                .frame(width: stepWidth, height: 44)
                 .background(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(Skin.normal.ink.opacity(0.12))
@@ -184,23 +203,15 @@ struct SetupView: View {
     // MARK: - プレビュー
 
     private var preview: some View {
-        VStack(spacing: 2) {
-            HStack(spacing: 4) {
-                Text("1区切り")
-                    .foregroundStyle(Skin.normal.inkDim)
-                Text(TimeText.japanese(config.splitSeconds))
-                    .fontWeight(.semibold)
-                    .foregroundStyle(Skin.normal.ink)
-            }
-            .font(.system(size: 14))
-
-            Text(config.givesWarning
-                 ? "残り\(TimeText.brief(config.splitSeconds * TimerConfig.warningRatio))で色が変わって軽く振動"
-                 : "1区切りが短いので、20%の合図は出ません")
-                .font(.system(size: 11))
+        HStack(spacing: 4) {
+            Text("1区切り")
                 .foregroundStyle(Skin.normal.inkDim)
-                .multilineTextAlignment(.center)
+            Text(TimeText.japanese(config.splitSeconds))
+                .fontWeight(.semibold)
+                .foregroundStyle(Skin.normal.ink)
         }
+        .font(.system(size: 14))
+        .frame(minHeight: 20)
     }
 
     // MARK: - プリセット
