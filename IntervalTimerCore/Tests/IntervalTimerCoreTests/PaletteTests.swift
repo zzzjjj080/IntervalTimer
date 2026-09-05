@@ -34,6 +34,35 @@ struct PaletteTests {
         #expect(Contrast.ratio(PaletteHex.warnBackground, PaletteHex.doneBackground) >= 2.5)
     }
 
+    @Test func 区切りの色はどれも地の色の上で読める() {
+        // 円環は太い線なので「大きな文字」の基準（3:1）で見る。
+        for hex in PaletteHex.segmentRamp {
+            let r = Contrast.ratio(hex, PaletteHex.background)
+            #expect(r >= 3.0, "\(String(hex, radix: 16)) が地の色に埋もれる（\(r)）")
+        }
+        // 設定画面の数字は小さいので本文の基準（4.5:1）。
+        #expect(Contrast.ratio(PaletteHex.accent, PaletteHex.background) >= 4.5)
+    }
+
+    @Test func 分割数ぶんの色を端から端まで使う() {
+        #expect(PaletteHex.segments(parts: 1) == [PaletteHex.segmentRamp.last!])
+        for n in 2...12 {
+            let c = PaletteHex.segments(parts: n)
+            #expect(c.count == n)
+            #expect(c.first == PaletteHex.segmentRamp.first)   // 冷たい色から
+            #expect(c.last == PaletteHex.segmentRamp.last)     // 暖かい色まで
+            #expect(Set(c).count == n, "\(n)分割で色が重複した")
+        }
+    }
+
+    @Test func 隣り合う区切りの色は見分けられる() {
+        // 12分割でも、隣どうしが同じに見えないこと。
+        let c = PaletteHex.segments(parts: 12)
+        for i in 0..<(c.count - 1) {
+            #expect(Contrast.ratio(c[i], c[i+1]) >= 1.05 || c[i] != c[i+1])
+        }
+    }
+
     @Test func 相対輝度の計算があっている() {
         #expect(Contrast.luminance(0xFFFFFF) == 1.0)
         #expect(Contrast.luminance(0x000000) == 0.0)

@@ -17,6 +17,32 @@ public enum PaletteHex {
     public static let warnInk: UInt32        = 0x1A1207
     public static let warnInkDim: UInt32     = 0x2B1D0A
 
+    /// 設定画面で「1区切り◯分」の数字に使う暖色。地の色の上で 7:1 出る。
+    public static let accent: UInt32 = 0xE8C04A
+
+    /// 区切りごとの色。**冷たい色から暖かい色へ、時計回りに進む。**
+    ///
+    /// 位置そのものが「どこまで来たか」を表す。数字を読まなくても、
+    /// 暖色まで来ていれば終わりが近いと分かる。最後は警告と同じ琥珀にしてある。
+    ///
+    /// 12色あるのは、分割の最大が12だから。分割が少ないときは
+    /// ``segments(parts:)`` が等間隔に選ぶので、いつでも端から端まで使う。
+    public static let segmentRamp: [UInt32] = [
+        0xA8DCE3, 0x7FD2D3, 0x56C7BE, 0x4EC3AE,
+        0x6BC98F, 0x93CF72, 0xBBD45C, 0xE0CE52,
+        0xE8C04A, 0xE9A63A, 0xE28A22, 0xD96A0B,
+    ]
+
+    /// 分割数ぶんの色を、``segmentRamp`` から等間隔に取る。
+    public static func segments(parts: Int) -> [UInt32] {
+        let n = max(1, parts)
+        guard n > 1 else { return [segmentRamp.last!] }
+        return (0..<n).map { i in
+            let t = Double(i) / Double(n - 1)
+            return segmentRamp[Int((t * Double(segmentRamp.count - 1)).rounded())]
+        }
+    }
+
     /// 終了。いちばん明るい。
     public static let doneBackground: UInt32 = 0xE8E2D4
     public static let doneInk: UInt32        = 0x17282C

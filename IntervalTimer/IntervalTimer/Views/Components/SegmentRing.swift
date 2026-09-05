@@ -16,6 +16,8 @@ struct SegmentRing: View {
     let progressInSplit: Double
     let skin: Skin
     let diameter: CGFloat
+    /// 区切りごとの色。`nil` なら単色（警告・終了のとき）。
+    var colors: [Color]? = nil
     var lineWidth: CGFloat = 9
     /// 終了後は全部を塗る。
     var allDone: Bool = false
@@ -23,14 +25,16 @@ struct SegmentRing: View {
     var body: some View {
         ZStack {
             ForEach(0..<max(1, parts), id: \.self) { i in
-                // 下敷き。まだ来ていない区切りも、ここで形が見える
+                // 下敷き。まだ来ていない区切りも、ここで形が見える。
+                // 色を使うときは、その区切り自身の色を薄くする。灰色に落とすと、
+                // 隣が何色だったか分からなくなって、位置で読めなくなる
                 ArcShape(startDegrees: start(i), spanDegrees: span, lineWidth: lineWidth)
-                    .stroke(skin.faint, style: stroke)
+                    .stroke(track(i), style: stroke)
 
                 let filled = amount(for: i)
                 if filled > 0 {
                     ArcShape(startDegrees: start(i), spanDegrees: span * filled, lineWidth: lineWidth)
-                        .stroke(skin.ink, style: stroke)
+                        .stroke(fill(i), style: stroke)
                 }
             }
         }
@@ -61,6 +65,19 @@ struct SegmentRing: View {
 
     private var stroke: StrokeStyle {
         StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+    }
+
+    /// まだ来ていない側。
+    ///
+    /// **その区切りの色を薄くするのではなく、無彩色にする。**
+    /// 薄めた暖色は濁って見えて、「まだ来ていない」ではなく「汚れている」ように読める。
+    /// 無彩色にしておくと、進むにつれて色が入っていく様子がはっきり出る。
+    private func track(_ i: Int) -> Color { skin.faint }
+
+    /// 済んだ側・進行中の塗り。
+    private func fill(_ i: Int) -> Color {
+        guard let colors, i < colors.count else { return skin.ink }
+        return colors[i]
     }
 
     private func amount(for i: Int) -> Double {

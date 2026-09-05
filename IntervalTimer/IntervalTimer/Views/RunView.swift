@@ -57,7 +57,8 @@ struct RunView: View {
                                 index: d.index,
                                 progressInSplit: progressInSplit(d, at: timeline.date),
                                 skin: skin,
-                                diameter: ringSide)
+                                diameter: ringSide,
+                                colors: skin.segmentColors(parts: d.config.parts))
                 }
                 numbers(d, skin: skin, width: ringSide)
             }

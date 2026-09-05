@@ -172,7 +172,7 @@ struct SetupView: View {
                 .foregroundStyle(Skin.normal.inkDim)
             Text(TimeText.japanese(config.splitSeconds))
                 .fontWeight(.semibold)
-                .foregroundStyle(Skin.normal.ink)
+                .foregroundStyle(Skin.normal.accent)
         }
         .font(.system(size: 14))
         .frame(minHeight: 20)

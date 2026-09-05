@@ -32,8 +32,20 @@ enum Skin {
         }
     }
 
-    /// セグメントバーの「まだ来ていない」ぶん。
+    /// 円環の「まだ来ていない」ぶん。
     var faint: Color { inkDim.opacity(0.28) }
+
+    /// 区切りごとの色。冷たい色から暖かい色へ、時計回りに進む。
+    ///
+    /// **通常のときだけ色を使う。** 警告と終了は地の色そのものが合図なので、
+    /// そこへ12色を重ねると何が起きたのか分からなくなる。単色に戻して地を主役にする。
+    func segmentColors(parts: Int) -> [Color]? {
+        guard self == .normal else { return nil }
+        return PaletteHex.segments(parts: parts).map { Color(hex: $0) }
+    }
+
+    /// 設定画面で数字に添える暖色。
+    var accent: Color { self == .normal ? Color(hex: PaletteHex.accent) : ink }
 }
 
 extension Color {
