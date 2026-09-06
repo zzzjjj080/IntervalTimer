@@ -317,7 +317,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zzzjjj080.IntervalTimer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer App Store";
+				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer iOS Dev";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				TARGETED_DEVICE_FAMILY = 1;
@@ -377,7 +377,7 @@
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "計測した練習を、ヘルスケアのワークアウトとして保存します。保存することで、腕を下ろして画面が消えている間もタイマーが動き続けます。";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zzzjjj080.IntervalTimer.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer Watch App Store";
+				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer Watch Dev";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
@@ -436,7 +436,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "インターバル";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zzzjjj080.IntervalTimer.watchkitapp.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer WatchWidget App Store";
+				PROVISIONING_PROFILE_SPECIFIER = "IntervalTimer WatchWidget Dev";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";

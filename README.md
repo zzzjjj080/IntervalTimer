@@ -1,16 +1,37 @@
-# インターバル（watchOS）
+# 区切りタイマー（watchOS / iOS）
 
-野球の練習で使う、Apple Watch 単体で動くインターバルタイマー。
+練習で使う、区切りつきのタイマー。**Apple Watch と iPhone のどちらでも動く。**
 全体時間と分割回数を入れると、**全体の残り時間と、いまの区切りの残り時間を同時に**出す。
 
-- 対象: Apple Watch Series 11 / watchOS 11.0 以降
-- 構成: watchOS 単体アプリ（iPhone コンパニオンなし）
-- バンドルID: `com.zzzjjj080.IntervalTimer`
+- 対象: watchOS 11.0 以降 / iOS 18.0 以降
+- App ID: `6808987041`（App Store 名「区切りタイマー」／英語 `Splits – Interval Timer`）
+
+## なぜ iOS アプリがあるのか
+
+**Xcode は watchOS のアーカイブを App Store へ出せない。**
+配布方式のクラスが iOS / Mac / tvOS / visionOS の分しか無く、Organizer の Custom にも出てこない。
+Apple の想定は「iOS アプリの中に Watch アプリを入れて出す」形。
+
+```
+IntervalTimer            iOS アプリ（配信の器）  com.zzzjjj080.IntervalTimer
+  └ Watch/
+     IntervalTimer Watch App                   ...IntervalTimer.watchkitapp
+       └ PlugIns/
+          IntervalTimerWidget                  ...watchkitapp.Widget
+```
+
+Watch 側に `WKRunsIndependentlyOfCompanionApp` を付けてあるので、
+**使う人は iPhone アプリを入れずに Apple Watch だけに入れられる。**
+
+**器を空のままにしない。** 中身の無いアプリは審査（2.1 / 4.2）で止まるし、入れた人も困る。
+同じタイマーを iPhone でも動かしてある。時間の測り方は `IntervalTimerCore`、
+絵は `IntervalTimerUI` を両方で共有している。
 
 ## 中身
 
 ```
 IntervalTimerCore/          UIに依存しないロジック。Xcodeを開かずに swift test で回せる
+IntervalTimerUI/            円環と配色。Watch と iPhone で共有する（SwiftUIだけ。WatchKit/UIKit に依存しない）
   TimerConfig.swift         全体秒数・分割数・区切りの境界
   TimerEngine.swift         経過の算出・区切りの判定・状態遷移
   TimeText.swift            秒 → 文字（切り上げ）
@@ -25,6 +46,7 @@ IntervalTimer/              watchOS アプリ
     Views/                  設定・実行・終了
       Components/SegmentRing.swift  区切りぶんに分かれた円環
   IntervalTimerWidget/      文字盤のコンプリケーション（押すとアプリが開く）
+  IntervalTimerPhone/       iPhone 側。裏に回ると通知で知らせる（Watch のワークアウトに当たる仕掛けが無いため）
 prototype/index.html        挙動を決めたHTMLプロトタイプ
 SPEC.md                     実装仕様
 ```
@@ -267,7 +289,9 @@ kill -STOP "$PID"; sleep 30; kill -CONT "$PID"
 strings .../Release-watchsimulator/IntervalTimer.app/IntervalTimer | grep IT_START   # 何も出ないこと
 
 # 実機
-./install-watch.sh
+./install-watch.sh      # Apple Watch へ
+./install-phone.sh      # iPhone へ（Watch も一緒に入る）
+./upload.sh             # アーカイブを作る（提出用）
 ```
 
 `IT_NO_WORKOUT=1` はヘルスケアの許可ダイアログを出さないための逃げ道。

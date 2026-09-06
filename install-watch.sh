@@ -54,10 +54,10 @@ cd "$ROOT/IntervalTimer"
 # 署名はプロジェクト側にターゲットごとに書いてある。
 # 本体とコンプリケーションで別のプロファイルが要るので、
 # コマンドラインで一括指定すると拡張のほうが必ず落ちる。
-xcodebuild -project IntervalTimer.xcodeproj -scheme IntervalTimer -configuration Debug \
+xcodebuild -project IntervalTimer.xcodeproj -scheme "IntervalTimer Watch App" -configuration Debug \
   -destination "platform=watchOS,id=$DEV" -destination-timeout 30 -derivedDataPath /tmp/it-device \
   build 2>&1 | grep -E "error:|BUILD SUCCEEDED"
 
 xcrun devicectl device install app --device "$DEV" \
-  /tmp/it-device/Build/Products/Debug-watchos/IntervalTimer.app 2>&1 | grep -E "bundleID"
+  "/tmp/it-device/Build/Products/Debug-watchos/IntervalTimer Watch App.app" 2>&1 | grep -E "bundleID"
 echo "✅ 完了。Watchのホーム画面に「インターバル」が出ます"
