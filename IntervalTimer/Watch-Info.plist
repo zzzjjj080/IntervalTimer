@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>WKApplication</key>
+	<true/>
+
+	<!-- 配信の器になる iOS アプリ。**Xcode は watchOS のアーカイブを
+	     App Store へ出せない**（配布方式のクラスが存在しない）ので、
+	     iOS アプリの中に入れて出す。 -->
+	<key>WKCompanionAppBundleIdentifier</key>
+	<string>com.zzzjjj080.IntervalTimer</string>
+
+	<!-- **これが肝。** 付けておくと、使う人は iPhone アプリを入れずに
+	     Apple Watch だけにインストールできる。単体で使える体験は変わらない。 -->
+	<key>WKRunsIndependentlyOfCompanionApp</key>
+	<true/>
+
+	<!-- 画面を消しても計測を続けるため。HKWorkoutSession の稼働に必要 -->
+	<key>WKBackgroundModes</key>
+	<array>
+		<string>workout-processing</string>
+	</array>
+</dict>
+</plist>

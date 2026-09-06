@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A10000000000000000000010"
-               BuildableName = "IntervalTimer.app"
-               BlueprintName = "IntervalTimer"
+               BlueprintIdentifier = "A10000000000000000000020"
+               BuildableName = "IntervalTimer Watch App.app"
+               BlueprintName = "IntervalTimer Watch App"
                ReferencedContainer = "container:IntervalTimer.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -44,9 +44,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A10000000000000000000010"
-            BuildableName = "IntervalTimer.app"
-            BlueprintName = "IntervalTimer"
+            BlueprintIdentifier = "A10000000000000000000020"
+            BuildableName = "IntervalTimer Watch App.app"
+            BlueprintName = "IntervalTimer Watch App"
             ReferencedContainer = "container:IntervalTimer.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -61,9 +61,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A10000000000000000000010"
-            BuildableName = "IntervalTimer.app"
-            BlueprintName = "IntervalTimer"
+            BlueprintIdentifier = "A10000000000000000000020"
+            BuildableName = "IntervalTimer Watch App.app"
+            BlueprintName = "IntervalTimer Watch App"
             ReferencedContainer = "container:IntervalTimer.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

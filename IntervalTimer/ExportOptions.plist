@@ -9,7 +9,8 @@
   <key>provisioningProfiles</key>
   <dict>
     <key>com.zzzjjj080.IntervalTimer</key><string>IntervalTimer App Store</string>
-    <key>com.zzzjjj080.IntervalTimer.Widget</key><string>IntervalTimer Widget App Store</string>
+    <key>com.zzzjjj080.IntervalTimer.watchkitapp</key><string>IntervalTimer Watch App Store</string>
+    <key>com.zzzjjj080.IntervalTimer.watchkitapp.Widget</key><string>IntervalTimer WatchWidget App Store</string>
   </dict>
   <key>uploadSymbols</key><true/>
   <key>destination</key><string>upload</string>
