@@ -10,6 +10,9 @@
 		A1000000000000000000001C /* IntervalTimer Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A10000000000000000000021 /* IntervalTimer Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A1000000000000000000002C /* IntervalTimerWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A10000000000000000000031 /* IntervalTimerWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A1000000000000000000002E /* IntervalTimerCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1000000000000000000002D /* IntervalTimerCore */; };
+		A10000000000000000000071 /* IntervalTimerUI in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000070 /* IntervalTimerUI */; };
+		A10000000000000000000073 /* IntervalTimerCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000072 /* IntervalTimerCore */; };
+		A10000000000000000000075 /* IntervalTimerUI in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000074 /* IntervalTimerUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,9 +73,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A10000000000000000000014 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A10000000000000000000014 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (
+				A10000000000000000000073 /* IntervalTimerCore in Frameworks */,
+				A10000000000000000000075 /* IntervalTimerUI in Frameworks */,
+			); runOnlyForDeploymentPostprocessing = 0; };
 		A10000000000000000000024 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (
 				A1000000000000000000002E /* IntervalTimerCore in Frameworks */,
+				A10000000000000000000071 /* IntervalTimerUI in Frameworks */,
 			); runOnlyForDeploymentPostprocessing = 0; };
 		A10000000000000000000034 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
@@ -121,7 +128,10 @@
 				A10000000000000000000012 /* IntervalTimerPhone */,
 			);
 			name = IntervalTimer;
-			packageProductDependencies = ();
+			packageProductDependencies = (
+				A10000000000000000000072 /* IntervalTimerCore */,
+				A10000000000000000000074 /* IntervalTimerUI */,
+			);
 			productName = IntervalTimer;
 			productReference = A10000000000000000000011 /* IntervalTimer.app */;
 			productType = "com.apple.product-type.application";
@@ -145,6 +155,7 @@
 			name = "IntervalTimer Watch App";
 			packageProductDependencies = (
 				A1000000000000000000002D /* IntervalTimerCore */,
+				A10000000000000000000070 /* IntervalTimerUI */,
 			);
 			productName = "IntervalTimer Watch App";
 			productReference = A10000000000000000000021 /* IntervalTimer Watch App.app */;
@@ -196,6 +207,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				A10000000000000000000050 /* XCLocalSwiftPackageReference "../IntervalTimerCore" */,
+				A10000000000000000000051 /* XCLocalSwiftPackageReference "../IntervalTimerUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A10000000000000000000003 /* Products */;
@@ -501,13 +513,17 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../IntervalTimerCore;
 		};
+		A10000000000000000000051 /* XCLocalSwiftPackageReference "../IntervalTimerUI" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../IntervalTimerUI;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A1000000000000000000002D /* IntervalTimerCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = IntervalTimerCore;
-		};
+		A1000000000000000000002D /* IntervalTimerCore */ = {isa = XCSwiftPackageProductDependency; productName = IntervalTimerCore; };
+		A10000000000000000000070 /* IntervalTimerUI */ = {isa = XCSwiftPackageProductDependency; productName = IntervalTimerUI; };
+		A10000000000000000000072 /* IntervalTimerCore */ = {isa = XCSwiftPackageProductDependency; productName = IntervalTimerCore; };
+		A10000000000000000000074 /* IntervalTimerUI */ = {isa = XCSwiftPackageProductDependency; productName = IntervalTimerUI; };
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A10000000000000000000001 /* Project object */;

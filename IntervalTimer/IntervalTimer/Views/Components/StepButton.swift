@@ -1,6 +1,7 @@
 import SwiftUI
 import WatchKit
 import IntervalTimerCore
+import IntervalTimerUI
 
 /// ＋ − のボタン。**押している間、増え続ける（減り続ける）。**
 ///

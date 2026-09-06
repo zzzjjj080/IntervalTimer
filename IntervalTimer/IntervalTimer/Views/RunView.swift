@@ -1,6 +1,7 @@
 import SwiftUI
 import WatchKit
 import IntervalTimerCore
+import IntervalTimerUI
 
 struct RunView: View {
     @Environment(Runner.self) private var runner

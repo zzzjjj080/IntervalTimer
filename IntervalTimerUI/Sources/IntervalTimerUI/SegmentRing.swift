@@ -8,21 +8,34 @@ import SwiftUI
 /// **大きさは呼び出し側が決めて `diameter` で渡す。**
 /// `GeometryReader` に測らせると、内側に置いた数字と取り合って
 /// 思ったより小さく描かれることがあった。円環は画面の骨格なので、寸法を握っておく。
-struct SegmentRing: View {
-    let parts: Int
+public struct SegmentRing: View {
+    public let parts: Int
     /// 進行中の区切り（0始まり）。
-    let index: Int
+    public let index: Int
     /// 進行中の区切りをどこまで塗るか。0...1。
-    let progressInSplit: Double
-    let skin: Skin
-    let diameter: CGFloat
+    public let progressInSplit: Double
+    public let skin: Skin
+    public let diameter: CGFloat
     /// 区切りごとの色。`nil` なら単色（警告・終了のとき）。
-    var colors: [Color]? = nil
-    var lineWidth: CGFloat = 9
+    public var colors: [Color]? = nil
+    public var lineWidth: CGFloat = 9
     /// 終了後は全部を塗る。
-    var allDone: Bool = false
+    public var allDone: Bool = false
 
-    var body: some View {
+    public init(parts: Int, index: Int, progressInSplit: Double, skin: Skin,
+                diameter: CGFloat, colors: [Color]? = nil,
+                lineWidth: CGFloat = 9, allDone: Bool = false) {
+        self.parts = parts
+        self.index = index
+        self.progressInSplit = progressInSplit
+        self.skin = skin
+        self.diameter = diameter
+        self.colors = colors
+        self.lineWidth = lineWidth
+        self.allDone = allDone
+    }
+
+    public var body: some View {
         ZStack {
             ForEach(0..<max(1, parts), id: \.self) { i in
                 // 下敷き。まだ来ていない区切りも、ここで形が見える。

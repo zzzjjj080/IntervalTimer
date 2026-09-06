@@ -1,5 +1,6 @@
 import SwiftUI
 import IntervalTimerCore
+import IntervalTimerUI
 
 struct RootView: View {
     @Environment(Runner.self) private var runner

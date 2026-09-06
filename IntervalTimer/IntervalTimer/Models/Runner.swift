@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import IntervalTimerCore
+import IntervalTimerUI
 
 /// 画面と ``TimerEngine`` をつなぐところ。時計を進め、起きたことを触覚に流す。
 ///
