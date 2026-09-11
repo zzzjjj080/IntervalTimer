@@ -5,6 +5,7 @@
 
 - 対象: watchOS 11.0 以降 / iOS 18.0 以降
 - App ID: `6808987041`（App Store 名「区切りタイマー」／英語 `Splits – Interval Timer`）
+- **公開中**: [App Store](https://apps.apple.com/jp/app/id6808987041)（2026-09-11・全地域・無料）
 
 ## なぜ iOS アプリがあるのか
 
