@@ -21,10 +21,17 @@
 	<key>WKRunsIndependentlyOfCompanionApp</key>
 	<true/>
 
-	<!-- 画面を消しても計測を続けるため。HKWorkoutSession の稼働に必要 -->
+	<!-- 走っている間、アプリを前面に留めて動かし続けるため。
+	     - workout-processing … HKWorkoutSession 用（本筋。上限なし）
+	     - self-care ………………… WKExtendedRuntimeSession 用（予備。上限1時間）
+
+	     **予備の側は、この種別を書かないと start() しても即 invalidate される。**
+	     ヘルスケアを断った人は本筋を使えないので、これが無いと
+	     1分ほどで文字盤に戻ってしまう（引き継ぎ書 4-112）。 -->
 	<key>WKBackgroundModes</key>
 	<array>
 		<string>workout-processing</string>
+		<string>self-care</string>
 	</array>
 </dict>
 </plist>

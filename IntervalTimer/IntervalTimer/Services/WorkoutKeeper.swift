@@ -64,6 +64,16 @@ final class WorkoutKeeper: NSObject {
         isEnding = false
         log("start(): ヘルスケアが使えるか = \(HKHealthStore.isHealthDataAvailable())")
 
+        #if DEBUG
+        // 予備の手段だけを試したいときの入口。ヘルスケアを拒否した人と同じ道を通す。
+        //   DEVICECTL_CHILD_IT_FORCE_EXTENDED=1 で起動する
+        if ProcessInfo.processInfo.environment["IT_FORCE_EXTENDED"] == "1" {
+            log("予備の手段を強制する")
+            startExtendedSession()
+            return
+        }
+        #endif
+
         guard HKHealthStore.isHealthDataAvailable() else {
             errors.append(String(localized: "この端末ではヘルスケアが使えません。"))
             startExtendedSession()
@@ -199,6 +209,9 @@ extension WorkoutKeeper: WKExtendedRuntimeSessionDelegate {
         error: (any Error)?
     ) {
         Task { @MainActor in
+            // **理由だけで落ちることがある**（種別が Info.plist に無い、など）。
+            // error が nil でも何が起きたか分かるように、まず reason を残す。
+            self.log("予備の手段が終わった: reason = \(reason.rawValue) / error = \(String(describing: error))")
             if let error {
                 self.errors.append(String(localized: "予備の手段も使えませんでした: \(error.localizedDescription)"))
             }
