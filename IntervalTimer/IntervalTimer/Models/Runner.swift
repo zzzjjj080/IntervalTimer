@@ -173,6 +173,12 @@ final class Runner {
         // 背面動作そのものの確認は実機でやる。
         if ProcessInfo.processInfo.environment["IT_NO_WORKOUT"] == "1" { return }
         #endif
+        // **一度きりの判定にしない。** 予備の手段は始まらないことがあるし、
+        // 動き出した後で死ぬこともある。そのたびに注意書きを出し直す。
+        keeper.onChange = { [weak self] in
+            guard let self, self.screen == .run else { return }
+            self.refreshBackgroundNote()
+        }
         let previous = keeperWork
         keeperWork = Task {
             await previous?.value
@@ -180,15 +186,23 @@ final class Runner {
             #if DEBUG
             print("[Runner] keeper.mode = \(keeper.mode) / errors = \(keeper.errors)")
             #endif
-            switch keeper.mode {
-            case .workout:
-                backgroundNote = nil
-            case .extended:
-                backgroundNote = String(localized: "予備の手段で動いています。連続で動ける時間に上限があります。")
-            case .none:
-                // 理由を消さずにそのまま出す。「押しても何も起きない」が一番たちが悪い。
-                backgroundNote = (keeper.firstError ?? String(localized: "背面で動かせません。")) + String(localized: "画面を消すとタイマーが止まります。")
-            }
+            refreshBackgroundNote()
+        }
+    }
+
+    /// いまの確保状況を1行にする。**確保できていないのに「動いています」と出さない。**
+    private func refreshBackgroundNote() {
+        #if DEBUG
+        print("[Runner] 注意書きを出し直す: mode = \(keeper.mode)")
+        #endif
+        switch keeper.mode {
+        case .workout:
+            backgroundNote = nil
+        case .extended:
+            backgroundNote = String(localized: "予備の手段で動いています。連続で動ける時間に上限があります。")
+        case .none:
+            // 理由を消さずにそのまま出す。「押しても何も起きない」が一番たちが悪い。
+            backgroundNote = (keeper.firstError ?? String(localized: "背面で動かせません。")) + String(localized: "画面を消すとタイマーが止まります。")
         }
     }
 

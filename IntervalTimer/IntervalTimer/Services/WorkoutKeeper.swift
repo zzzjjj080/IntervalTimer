@@ -30,6 +30,11 @@ final class WorkoutKeeper: NSObject {
 
     private(set) var mode: Mode = .none
 
+    /// 状態が変わったときに呼ぶ。**始めた直後だけでなく、途中で死んだときも**
+    /// 画面の注意書きを出し直すために要る。これが無いと、
+    /// 予備の手段が始まらなかったのに「動いています」と出したままになる。
+    var onChange: (@MainActor () -> Void)?
+
     /// 起きたことを全部ためる。**最初の1件がいちばん本当の原因に近い**ので、上書きしない。
     private(set) var errors: [String] = []
     var firstError: String? { errors.first }
@@ -125,6 +130,9 @@ final class WorkoutKeeper: NSObject {
         }
     }
 
+    /// **始まったかどうかは、ここでは分からない。** `start()` は投げるだけで、
+    /// 成否は `extendedRuntimeSessionDidStart` / `didInvalidateWith` で返ってくる。
+    /// いったん `.extended` と置くが、失敗したら委譲側が `.none` へ直して ``onChange`` を鳴らす。
     private func startExtendedSession() {
         log("予備の手段へ落ちる。errors = \(errors)")
         let s = WKExtendedRuntimeSession()
@@ -179,6 +187,7 @@ extension WorkoutKeeper: HKWorkoutSessionDelegate {
             if self.mode == .workout, self.session != nil {
                 self.errors.append(String(localized: "ワークアウトが外から止められました。画面を消すと計測が止まります。"))
                 self.mode = .none
+                self.onChange?()
             }
         }
     }
@@ -187,6 +196,7 @@ extension WorkoutKeeper: HKWorkoutSessionDelegate {
         Task { @MainActor in
             self.errors.append(String(localized: "ワークアウトが止まりました: \(error.localizedDescription)"))
             self.mode = .none
+            self.onChange?()
         }
     }
 }
@@ -195,11 +205,18 @@ extension WorkoutKeeper: HKWorkoutSessionDelegate {
 
 extension WorkoutKeeper: WKExtendedRuntimeSessionDelegate {
 
-    nonisolated func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {}
+    nonisolated func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
+        Task { @MainActor in
+            self.log("予備の手段が始まった")
+            self.mode = .extended
+            self.onChange?()
+        }
+    }
 
     nonisolated func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
         Task { @MainActor in
             self.errors.append(String(localized: "まもなく時間切れです。画面を点けたままにしてください。"))
+            self.onChange?()
         }
     }
 
@@ -214,8 +231,12 @@ extension WorkoutKeeper: WKExtendedRuntimeSessionDelegate {
             self.log("予備の手段が終わった: reason = \(reason.rawValue) / error = \(String(describing: error))")
             if let error {
                 self.errors.append(String(localized: "予備の手段も使えませんでした: \(error.localizedDescription)"))
+            } else {
+                // 理由だけで終わることもある。**黙って消えるのが一番たちが悪い**ので、必ず1行残す。
+                self.errors.append(String(localized: "予備の手段が終わりました。"))
             }
             if self.mode == .extended { self.mode = .none }
+            self.onChange?()
         }
     }
 }
