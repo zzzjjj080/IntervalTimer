@@ -3,7 +3,7 @@
 # iPhone に繋いだ状態で叩く（USB。ロック解除しておく）。
 set -e
 # `xcodebuild | grep` の形でも、ビルドが失敗したらここで止める。
-# 無いと前のビルドの .app を入れて「完了」と出してしまう（引き継ぎ書 4-142）
+# 無いと前のビルドの .app を入れて「完了」と出してしまう（引き継ぎ書 4-145）
 set -o pipefail
 cd "$(dirname "$0")/IntervalTimer"
 
