@@ -14,6 +14,9 @@
 # 「HealthKit が無い」と言われる。プロファイルは ./Tools-MakeProfile.py で作る。
 # 本体とコンプリケーションで2枚要る（バンドルIDが別なので）。
 set -e
+# `xcodebuild | grep` の形でも、ビルドが失敗したらここで止める。
+# 無いと前のビルドの .app を入れて「完了」と出してしまう（引き継ぎ書 4-142）
+set -o pipefail
 cd "$(dirname "$0")"
 ROOT="$PWD"
 PROFILE="IntervalTimer watchOS Development"
