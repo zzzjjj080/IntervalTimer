@@ -95,11 +95,14 @@ public struct TimerEngine: Equatable, Sendable {
 
     /// 今の区切り（0始まり）。
     ///
-    /// 1区切りの秒数を足し込まず、割り算1回で出している。丸め誤差が溜まらない。
+    /// **境界（``TimerConfig/boundary(_:)``）と比べて出す。** 境界はちょうどの秒に丸めてあるので、
+    /// 割り算で出すと 7.5 秒と 8 秒の間で番号だけ先に進み、数字や振動と食い違う。
+    /// 分割は最大12なので、先頭から比べても軽い。1区切りぶんを足し込まないので誤差も溜まらない。
     public func index(at elapsed: Double) -> Int {
-        guard elapsed > 0, config.totalSeconds > 0 else { return 0 }
-        let raw = Int(floor(elapsed * Double(config.parts) / config.totalSeconds))
-        return raw.clamped(to: 0...(config.parts - 1))
+        guard elapsed > 0 else { return 0 }
+        var i = 0
+        while i < config.parts - 1, elapsed >= config.boundary(i + 1) { i += 1 }
+        return i
     }
 
     // MARK: - 進める
@@ -130,7 +133,7 @@ public struct TimerEngine: Equatable, Sendable {
             events.append(.splitEnded(nextIndex: idx))
         }
 
-        if !warned, config.givesWarning, remainingInSplit(at: e, index: idx) <= splitLength(index: idx) * TimerConfig.warningRatio {
+        if !warned, config.givesWarning, e >= config.warningPoint(idx) {
             warned = true
             events.append(.warning)
         }
@@ -182,7 +185,7 @@ public struct TimerEngine: Equatable, Sendable {
             index: idx,
             // 色は「今そうであるか」で決める。1回だけのフラグ(`warned`)は振動用で、こちらには使わない。
             // 裏から復帰したときも、その瞬間の残り時間だけを見て正しい色になる。
-            isWarning: !finished && config.givesWarning && left <= length * TimerConfig.warningRatio,
+            isWarning: !finished && config.givesWarning && e >= config.warningPoint(idx),
             isFinished: finished,
             isRunning: running,
             anchor: virtualStart

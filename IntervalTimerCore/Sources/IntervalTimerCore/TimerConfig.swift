@@ -31,8 +31,27 @@ public struct TimerConfig: Equatable, Hashable, Codable, Sendable {
 
     /// i 番目の区切りが終わる時刻（開始からの秒数）。i は 0...parts。
     /// `boundary(0) == 0`、`boundary(parts) == totalSeconds` になる。
+    ///
+    /// **ちょうどの秒に丸める。** 全体の秒数は必ず整数（分×60）なので、全体の残りの数字は
+    /// ちょうどの秒で切り替わる。区切りの境目が 7.5 秒のような半端な位置だと、
+    /// 区切りの数字と円環はそこから1秒ごとに切り替わり、**全体の数字と0.5秒ずれて減る**
+    /// （実機で「全体の時間が合わない」と言われた。2026-09-13）。
+    /// 丸めれば、全体・区切り・円環・振動がすべて同じ1秒の刻みで動く。
+    /// 区切りの長さは最大0.5秒ずつ揺れる（1分×8 なら 8・7・8・7…秒）が、全体の長さは変わらない。
+    ///
+    /// 都度計算なので誤差は溜まらない。1区切りは最短5秒（1分×12）あるので、丸めても順序は入れ替わらない。
     public func boundary(_ i: Int) -> Double {
-        totalSeconds * Double(i.clamped(to: 0...parts)) / Double(parts)
+        (totalSeconds * Double(i.clamped(to: 0...parts)) / Double(parts)).rounded()
+    }
+
+    /// i 番目の区切りで「残りわずか」の合図を出す時刻（開始からの秒数）。
+    ///
+    /// これも**ちょうどの秒**にする。境目と同じ理由で、半端な瞬間に色が変わると数字と合わない。
+    /// 合図を出すかどうか（``givesWarning``）は、丸める前の長さで決める。
+    public func warningPoint(_ i: Int) -> Double {
+        let end = boundary(i + 1)
+        let length = end - boundary(i)
+        return end - (length * Self.warningRatio).rounded()
     }
 
     /// 区切りの途中の合図を出すかどうか。

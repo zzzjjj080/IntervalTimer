@@ -35,8 +35,8 @@ final class PhoneNotifier {
             let end = anchor.addingTimeInterval(config.boundary(i))
             // 途中の合図（75%）
             if config.givesWarning {
-                let cue = anchor.addingTimeInterval(
-                    config.boundary(i) - config.splitSeconds * TimerConfig.warningRatio)
+                // Watch と同じ時刻にする（ちょうどの秒）。区切り i は 1 始まりなので、番号は i - 1
+                let cue = anchor.addingTimeInterval(config.warningPoint(i - 1))
                 if cue > now {
                     await add(at: cue, id: "cue-\(i)",
                               title: String(localized: "そろそろ区切りです"),
