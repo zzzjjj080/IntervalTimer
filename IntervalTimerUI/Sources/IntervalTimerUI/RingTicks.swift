@@ -26,4 +26,21 @@ public enum RingClock {
     public static func splitEnd(anchor: Date, config: TimerConfig, index: Int) -> Date {
         anchor.addingTimeInterval(config.boundary(index + 1))
     }
+
+    /// 区切りの中でどこまで塗るか。0...1。**1秒単位に切り捨てる。**
+    ///
+    /// 区切りの数字が1秒ごとに減るのに合わせ、弧も1秒に1目盛りずつ進める。
+    /// **境目で前のマスが満タンになり、次のマスはちょうど1秒後に1目盛り目が塗られる。**
+    ///
+    /// 経過をそのまま割ると、境目で番号が切り替わった直後の描き直し（1秒刻みの外で起きる）で
+    /// 次のマスに細い筋が出て、「満タンとほぼ同時に次を塗り始めた」ように見えた（実機。2026-09-13）。
+    public static func progress(elapsed: Double, config: TimerConfig, index: Int) -> Double {
+        let from = config.boundary(index)
+        let to = config.boundary(index + 1)
+        guard to > from else { return 0 }
+        // 描き直しの時刻は「区切りの終わり − 整数秒」で作られ、浮動小数の誤差でわずかに手前へ出ることがある。
+        // そのまま切り捨てると1秒遅れるので、ほんの少し足してから切り捨てる
+        let whole = floor(elapsed - from + 1e-6)
+        return (whole / (to - from)).clamped(to: 0...1)
+    }
 }

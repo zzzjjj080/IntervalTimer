@@ -63,6 +63,13 @@ public enum PaletteHex {
     public static let doneBackground: UInt32 = 0xE8E2D4
     public static let doneInk: UInt32        = 0x17282C
     public static let doneInkDim: UInt32     = 0x4A5A5D
+
+    /// 一時停止。**落ち着いた紫。** ほかの状態にも円環の12色にも使っていない色相にしてある。
+    /// 目を上げた瞬間に「止まっている」と分かることを優先する（通常の青緑と取り違えない）。
+    /// 明るさも通常より一段上げて、色相が分かりにくい人にも差が出るようにする。
+    public static let pausedBackground: UInt32 = 0x4B3F8F
+    public static let pausedInk: UInt32        = 0xF4F2FB
+    public static let pausedInkDim: UInt32     = 0xC9C2EE
 }
 
 /// WCAG の相対輝度とコントラスト比。目視ではなく数字で確かめるために置いている。

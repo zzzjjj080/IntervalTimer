@@ -1,18 +1,19 @@
 import SwiftUI
 import IntervalTimerCore
 
-/// 画面の3状態。色はここで一括して決める。
+/// 画面の4状態。色はここで一括して決める。
 ///
 /// 状態ごとに「地の色・文字・弱い文字」を組で持たせてある。
 /// 個々の場所で `if isWarning { ... }` と書き分けると必ず抜けが出る。
 public enum Skin: Sendable {
-    case normal, warning, done
+    case normal, warning, done, paused
 
     public var background: Color {
         switch self {
         case .normal: Color(hex: PaletteHex.background)
         case .warning: Color(hex: PaletteHex.warnBackground)
         case .done: Color(hex: PaletteHex.doneBackground)
+        case .paused: Color(hex: PaletteHex.pausedBackground)
         }
     }
 
@@ -21,6 +22,7 @@ public enum Skin: Sendable {
         case .normal: Color(hex: PaletteHex.ink)
         case .warning: Color(hex: PaletteHex.warnInk)
         case .done: Color(hex: PaletteHex.doneInk)
+        case .paused: Color(hex: PaletteHex.pausedInk)
         }
     }
 
@@ -29,6 +31,7 @@ public enum Skin: Sendable {
         case .normal: Color(hex: PaletteHex.inkDim)
         case .warning: Color(hex: PaletteHex.warnInkDim)
         case .done: Color(hex: PaletteHex.doneInkDim)
+        case .paused: Color(hex: PaletteHex.pausedInkDim)
         }
     }
 

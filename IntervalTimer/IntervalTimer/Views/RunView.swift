@@ -132,12 +132,9 @@ struct RunView: View {
 
     // MARK: - 円環の進み具合
 
-    /// いまの区切りをどこまで進んだか。0...1。
+    /// いまの区切りをどこまで塗るか。0...1。1秒単位（`RingClock`。iPhone と同じ計算）。
     private func progressInSplit(_ d: Runner.Display, at now: Date) -> Double {
-        let from = d.config.boundary(d.index)
-        let to = d.config.boundary(d.index + 1)
-        guard to > from else { return 0 }
-        return ((elapsed(d, at: now) - from) / (to - from)).clamped(to: 0...1)
+        RingClock.progress(elapsed: elapsed(d, at: now), config: d.config, index: d.index)
     }
 
     /// 開始からの経過。止まっている間は動かない。

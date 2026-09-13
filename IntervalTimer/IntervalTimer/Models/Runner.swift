@@ -30,6 +30,8 @@ final class Runner {
 
         var skin: Skin {
             if isFinished { return .done }
+            // 止めているときは、残りわずかの最中でも一時停止の色を出す。「止まっている」がいちばん大事
+            if isPaused { return .paused }
             return isWarning ? .warning : .normal
         }
     }

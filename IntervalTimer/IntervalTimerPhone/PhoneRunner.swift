@@ -27,6 +27,8 @@ final class PhoneRunner {
 
         var skin: Skin {
             if isFinished { return .done }
+            // 止めているときは、残りわずかの最中でも一時停止の色を出す（Watch と同じ）
+            if isPaused { return .paused }
             return isWarning ? .warning : .normal
         }
     }

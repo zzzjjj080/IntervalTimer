@@ -56,6 +56,19 @@ struct PaletteTests {
         #expect(Contrast.ratio(PaletteHex.startFill, PaletteHex.background) >= 3.0)
     }
 
+    @Test func 一時停止はほかの状態とはっきり違って見える() {
+        // 文字は本文の基準で読める
+        #expect(Contrast.ratio(PaletteHex.pausedInk, PaletteHex.pausedBackground) >= 4.5)
+        #expect(Contrast.ratio(PaletteHex.pausedInkDim, PaletteHex.pausedBackground) >= 4.5)
+        // 通常とは明るさでも差をつける（色相だけに頼らない）
+        #expect(Contrast.ratio(PaletteHex.pausedBackground, PaletteHex.background) >= 1.5)
+        // 残りわずか・終了とも取り違えない
+        #expect(Contrast.ratio(PaletteHex.pausedBackground, PaletteHex.warnBackground) >= 2.0)
+        #expect(Contrast.ratio(PaletteHex.pausedBackground, PaletteHex.doneBackground) >= 3.0)
+        // 円環の12色のどれとも同じにしない
+        #expect(!PaletteHex.segmentRamp.contains(PaletteHex.pausedBackground))
+    }
+
     @Test func 分割数ぶんの色を端から端まで使う() {
         #expect(PaletteHex.segments(parts: 1) == [PaletteHex.segmentRamp.last!])
         for n in 2...12 {

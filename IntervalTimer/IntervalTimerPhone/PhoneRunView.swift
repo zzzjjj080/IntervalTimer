@@ -72,10 +72,9 @@ struct PhoneRunView: View {
         .frame(width: max(60, width - 60))
     }
 
+    /// 1秒単位で塗る（`RingClock`。Watch と同じ計算）
     private func progress(_ d: PhoneRunner.Display, at now: Date) -> Double {
-        let from = d.config.boundary(d.index), to = d.config.boundary(d.index + 1)
-        guard to > from else { return 0 }
-        return ((elapsed(d, at: now) - from) / (to - from)).clamped(to: 0...1)
+        RingClock.progress(elapsed: elapsed(d, at: now), config: d.config, index: d.index)
     }
 
     private func elapsed(_ d: PhoneRunner.Display, at now: Date) -> Double {
