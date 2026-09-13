@@ -17,7 +17,8 @@ struct PhoneRunView: View {
                     VStack(spacing: 0) {
                         Spacer(minLength: 0)
                         ZStack {
-                            TimelineView(.periodic(from: .now, by: 1)) { t in
+                            // 起点は区切りの終わり（`RingClock`）。Watch と同じ。`.now` だと数字と最大1秒ずれる
+                            TimelineView(.ringTicks(anchor: d.anchor, config: d.config, index: d.index)) { t in
                                 SegmentRing(parts: d.config.parts, index: d.index,
                                             progressInSplit: progress(d, at: t.date),
                                             skin: skin, diameter: side,

@@ -12,6 +12,10 @@ let package = Package(
     targets: [
         .target(name: "IntervalTimerUI", dependencies: [
             .product(name: "IntervalTimerCore", package: "IntervalTimerCore")
+        ]),
+        .testTarget(name: "IntervalTimerUITests", dependencies: [
+            "IntervalTimerUI",
+            .product(name: "IntervalTimerCore", package: "IntervalTimerCore")
         ])
     ]
 )

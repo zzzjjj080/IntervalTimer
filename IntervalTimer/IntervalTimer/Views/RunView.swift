@@ -53,7 +53,9 @@ struct RunView: View {
                 // 秒の数字はシステムが描いているので、こちらの都合で巻き込まない。
                 // 0.1秒ごとにすると滑らかになるが、1区切り5分なら1秒で弧の1/300しか進まず、
                 // 目では段が見えない。腕に着けて1時間動かすものなので、粗いほうを選ぶ。
-                TimelineView(.periodic(from: .now, by: 1)) { timeline in
+                // **起点は区切りの終わり**（`RingClock`）。`.now` にすると描き直した瞬間が起点になり、
+                // 数字の切り替わりと最大1秒ずれる。描き直すたびに起点が変わるので、合う時と合わない時が出た。
+                TimelineView(.ringTicks(anchor: d.anchor, config: d.config, index: d.index)) { timeline in
                     SegmentRing(parts: d.config.parts,
                                 index: d.index,
                                 progressInSplit: progressInSplit(d, at: timeline.date),
