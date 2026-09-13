@@ -1,6 +1,5 @@
 import Foundation
 import HealthKit
-import WatchKit
 
 /// 画面を消してもアプリを動かし続けるための入れ物。
 ///
@@ -8,8 +7,9 @@ import WatchKit
 /// タイマーとして使い物にならなくなる。`HKWorkoutSession` が `.running` の間は
 /// フォアグラウンド相当の扱いになり、実行も触覚も続く。実際に運動している場面なので用途としても正当。
 ///
-/// 許可が取れなかったときは ``WKExtendedRuntimeSession`` へ落ちる。
-/// こちらは連続動作の時間に上限があるので、その旨を画面に出す。
+/// **予備の手段は持たない**（2026-09-13 決定）。`WKExtendedRuntimeSession`（self-care）を試したが、
+/// 上限が10分で練習の長さに足りず、実機では30秒ほどで文字盤に戻った。野球のタイマーが
+/// self-care を宣言する理由も審査で説明しにくい。ヘルスケアを断った人には、許可を画面で案内する。
 ///
 /// **失敗は握り潰さない。** 無反応が一番たちが悪いので、
 /// 起きたことは全部 ``errors`` に積んで画面から見えるようにしている。
@@ -18,21 +18,22 @@ import WatchKit
 final class WorkoutKeeper: NSObject {
 
     enum Mode: Equatable {
-        /// ワークアウトとして動いている。いちばん確実。
+        /// ワークアウトとして動いている。画面を消しても止まらない。
         case workout
-        /// 予備の手段。連続動作の時間に上限がある。
-        case extended
         /// 何も確保できていない。画面を消すと止まる。
         case none
 
-        var keepsRunningInBackground: Bool { self != .none }
+        var keepsRunningInBackground: Bool { self == .workout }
     }
 
     private(set) var mode: Mode = .none
 
-    /// 状態が変わったときに呼ぶ。**始めた直後だけでなく、途中で死んだときも**
-    /// 画面の注意書きを出し直すために要る。これが無いと、
-    /// 予備の手段が始まらなかったのに「動いています」と出したままになる。
+    /// **ヘルスケアで断られている。** このときだけ、画面で「許可すると動き続ける」と案内する。
+    /// 端末が対応していない・一時的な失敗とは分けて持つ（案内しても直らないため）。
+    private(set) var needsHealthPermission = false
+
+    /// 状態が変わったときに呼ぶ。**始めた直後だけでなく、途中で止められたときも**
+    /// 画面の注意書きを出し直すために要る。
     var onChange: (@MainActor () -> Void)?
 
     /// 起きたことを全部ためる。**最初の1件がいちばん本当の原因に近い**ので、上書きしない。
@@ -41,12 +42,10 @@ final class WorkoutKeeper: NSObject {
 
     #if DEBUG
     /// いま握っているセッションの状態を1行で。足あとに添えて、戻された瞬間の様子を残す。
-    /// ワークアウト: 1=notStarted 2=running 3=ended 4=paused 5=prepared 6=stopped
-    /// 予備: 0=notStarted 1=scheduled 2=running 3=invalid
+    /// 1=notStarted 2=running 3=ended 4=paused 5=prepared 6=stopped
     var stateText: String {
         let w = session.map { String($0.state.rawValue) } ?? "-"
-        let e = extended.map { String($0.state.rawValue) } ?? "-"
-        return "mode=\(mode) W=\(w) E=\(e)"
+        return "mode=\(mode) W=\(w)"
     }
     #endif
 
@@ -57,7 +56,6 @@ final class WorkoutKeeper: NSObject {
     private var isEnding = false
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
-    private var extended: WKExtendedRuntimeSession?
 
     private var shareTypes: Set<HKSampleType> {
         [HKObjectType.workoutType(), HKQuantityType(.activeEnergyBurned)]
@@ -78,22 +76,13 @@ final class WorkoutKeeper: NSObject {
 
     func start() async {
         errors.removeAll()
+        needsHealthPermission = false
         isEnding = false
+        mode = .none
         log("start(): ヘルスケアが使えるか = \(HKHealthStore.isHealthDataAvailable())")
-
-        #if DEBUG
-        // 予備の手段だけを試したいときの入口。ヘルスケアを拒否した人と同じ道を通す。
-        //   DEVICECTL_CHILD_IT_FORCE_EXTENDED=1 で起動する
-        if ProcessInfo.processInfo.environment["IT_FORCE_EXTENDED"] == "1" {
-            log("予備の手段を強制する")
-            startExtendedSession()
-            return
-        }
-        #endif
 
         guard HKHealthStore.isHealthDataAvailable() else {
             errors.append(String(localized: "この端末ではヘルスケアが使えません。"))
-            startExtendedSession()
             return
         }
 
@@ -103,17 +92,16 @@ final class WorkoutKeeper: NSObject {
         } catch {
             log("requestAuthorization: 失敗 \(error)")
             errors.append(String(localized: "ヘルスケアの許可を確認できませんでした: \(error.localizedDescription)"))
-            startExtendedSession()
             return
         }
 
         // requestAuthorization は「拒否された」場合も成功で返る。状態を別に見る必要がある。
+        // 一度断られると、二度と許可のダイアログは出ない。設定から変えてもらうしかない。
         let st = store.authorizationStatus(for: HKObjectType.workoutType())
         log("workoutType の状態 = \(st.rawValue)  (0=未定 1=拒否 2=許可)")
-        log("activeEnergy の状態 = \(store.authorizationStatus(for: HKQuantityType(.activeEnergyBurned)).rawValue)")
         guard st == .sharingAuthorized else {
+            needsHealthPermission = true
             errors.append(String(localized: "ワークアウトの保存が許可されていません。"))
-            startExtendedSession()
             return
         }
 
@@ -138,20 +126,7 @@ final class WorkoutKeeper: NSObject {
         } catch {
             log("ワークアウトの開始で例外: \(error)")
             errors.append(String(localized: "ワークアウトを開始できませんでした: \(error.localizedDescription)"))
-            startExtendedSession()
         }
-    }
-
-    /// **始まったかどうかは、ここでは分からない。** `start()` は投げるだけで、
-    /// 成否は `extendedRuntimeSessionDidStart` / `didInvalidateWith` で返ってくる。
-    /// いったん `.extended` と置くが、失敗したら委譲側が `.none` へ直して ``onChange`` を鳴らす。
-    private func startExtendedSession() {
-        log("予備の手段へ落ちる。errors = \(errors)")
-        let s = WKExtendedRuntimeSession()
-        s.delegate = self
-        s.start()
-        extended = s
-        mode = .extended
     }
 
     // MARK: - 終了
@@ -172,10 +147,6 @@ final class WorkoutKeeper: NSObject {
         }
         session = nil
         builder = nil
-
-        extended?.invalidate()
-        extended = nil
-
         mode = .none
         isEnding = false
     }
@@ -208,46 +179,6 @@ extension WorkoutKeeper: HKWorkoutSessionDelegate {
         Task { @MainActor in
             self.errors.append(String(localized: "ワークアウトが止まりました: \(error.localizedDescription)"))
             self.mode = .none
-            self.onChange?()
-        }
-    }
-}
-
-// MARK: - WKExtendedRuntimeSessionDelegate
-
-extension WorkoutKeeper: WKExtendedRuntimeSessionDelegate {
-
-    nonisolated func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
-        Task { @MainActor in
-            self.log("予備の手段が始まった")
-            self.mode = .extended
-            self.onChange?()
-        }
-    }
-
-    nonisolated func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
-        Task { @MainActor in
-            self.errors.append(String(localized: "まもなく時間切れです。画面を点けたままにしてください。"))
-            self.onChange?()
-        }
-    }
-
-    nonisolated func extendedRuntimeSession(
-        _ extendedRuntimeSession: WKExtendedRuntimeSession,
-        didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason,
-        error: (any Error)?
-    ) {
-        Task { @MainActor in
-            // **理由だけで落ちることがある**（種別が Info.plist に無い、など）。
-            // error が nil でも何が起きたか分かるように、まず reason を残す。
-            self.log("予備の手段が終わった: reason = \(reason.rawValue) / error = \(String(describing: error))")
-            if let error {
-                self.errors.append(String(localized: "予備の手段も使えませんでした: \(error.localizedDescription)"))
-            } else {
-                // 理由だけで終わることもある。**黙って消えるのが一番たちが悪い**ので、必ず1行残す。
-                self.errors.append(String(localized: "予備の手段が終わりました。"))
-            }
-            if self.mode == .extended { self.mode = .none }
             self.onChange?()
         }
     }

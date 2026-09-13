@@ -70,7 +70,8 @@ struct SetupView: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("start")
 
-                    if let note = runner.backgroundNote {
+                    // 断られているときは、どこで許可を変えるかまで書いた長い案内を出す
+                    if let note = runner.backgroundHelp ?? runner.backgroundNote {
                         Text(note)
                             .font(.system(size: 11))
                             .foregroundStyle(Skin.normal.inkDim)

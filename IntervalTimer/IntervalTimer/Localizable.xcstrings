@@ -139,22 +139,32 @@
         }
       }
     },
-    "予備の手段で動いています。連続で動ける時間に上限があります。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Running in backup mode. It can only stay active for a limited time."
-          }
-        }
-      }
-    },
     "背面で動かせません。": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Can't keep running in the background."
+          }
+        }
+      }
+    },
+    "画面を消すと止まります。ヘルスケアの許可が必要です。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stops when the screen turns off. Health access is needed."
+          }
+        }
+      }
+    },
+    "ヘルスケアを許可すると、画面を消しても動き続けます。iPhoneのヘルスケア → プロフィール → アプリ で、このアプリをオンにしてください。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Health access to keep running with the screen off. On iPhone, open Health → your profile picture → Apps, and turn this app on."
           }
         }
       }
@@ -235,26 +245,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "The workout stopped: %@"
-          }
-        }
-      }
-    },
-    "まもなく時間切れです。画面を点けたままにしてください。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Time is almost up. Keep the screen on."
-          }
-        }
-      }
-    },
-    "予備の手段も使えませんでした: %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The backup method didn't work either: %@"
           }
         }
       }

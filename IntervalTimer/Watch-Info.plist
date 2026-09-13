@@ -21,17 +21,12 @@
 	<key>WKRunsIndependentlyOfCompanionApp</key>
 	<true/>
 
-	<!-- 走っている間、アプリを前面に留めて動かし続けるため。
-	     - workout-processing … HKWorkoutSession 用（本筋。上限なし）
-	     - self-care ………………… WKExtendedRuntimeSession 用（予備。**上限10分**。1時間は誤り、ワンタップタイマーで実測）
-
-	     **予備の側は、この種別を書かないと start() しても即 invalidate される。**
-	     ヘルスケアを断った人は本筋を使えないので、これが無いと
-	     1分ほどで文字盤に戻ってしまう（引き継ぎ書 4-112）。 -->
+	<!-- 走っている間、アプリを前面に留めて動かし続けるため。HKWorkoutSession に必要。
+	     self-care（WKExtendedRuntimeSession）は宣言しない。上限が10分で練習の長さに足りず、
+	     野球のタイマーが使う理由も審査で説明しにくい。ヘルスケアを断った人には、許可を画面で案内する（2026-09-13 決定）。 -->
 	<key>WKBackgroundModes</key>
 	<array>
 		<string>workout-processing</string>
-		<string>self-care</string>
 	</array>
 </dict>
 </plist>

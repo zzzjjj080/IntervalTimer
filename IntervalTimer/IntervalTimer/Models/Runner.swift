@@ -44,6 +44,9 @@ final class Runner {
 
     /// 前回の実行で背面動作を確保できなかったときの注意書き。設定画面に1行出す。
     private(set) var backgroundNote: String?
+    /// 設定画面に出す、もう少し長い案内。**ヘルスケアで断られているときだけ**入る。
+    /// 実行画面は小さい文字で2行しか入らないので、どこで許可を変えるかはこちらに書く。
+    private(set) var backgroundHelp: String?
 
     private var engine: TimerEngine?
     private var ticker: Task<Void, Never>?
@@ -184,8 +187,8 @@ final class Runner {
         // 背面動作そのものの確認は実機でやる。
         if ProcessInfo.processInfo.environment["IT_NO_WORKOUT"] == "1" { return }
         #endif
-        // **一度きりの判定にしない。** 予備の手段は始まらないことがあるし、
-        // 動き出した後で死ぬこともある。そのたびに注意書きを出し直す。
+        // **一度きりの判定にしない。** ワークアウトは途中で外から止められることがある。
+        // そのたびに注意書きを出し直す。
         keeper.onChange = { [weak self] in
             guard let self, self.screen == .run else { return }
             self.refreshBackgroundNote()
@@ -209,11 +212,19 @@ final class Runner {
         switch keeper.mode {
         case .workout:
             backgroundNote = nil
-        case .extended:
-            backgroundNote = String(localized: "予備の手段で動いています。連続で動ける時間に上限があります。")
+            backgroundHelp = nil
         case .none:
-            // 理由を消さずにそのまま出す。「押しても何も起きない」が一番たちが悪い。
-            backgroundNote = (keeper.firstError ?? String(localized: "背面で動かせません。")) + String(localized: "画面を消すとタイマーが止まります。")
+            if keeper.needsHealthPermission {
+                // 一度断られると、許可のダイアログは二度と出ない。**どこで変えるかまで書く。**
+                // Apple Watch だけで変える手順は無く、iPhone のヘルスケアで変える
+                // （Apple の説明 support.apple.com/108779 の表記に合わせた）
+                backgroundNote = String(localized: "画面を消すと止まります。ヘルスケアの許可が必要です。")
+                backgroundHelp = String(localized: "ヘルスケアを許可すると、画面を消しても動き続けます。iPhoneのヘルスケア → プロフィール → アプリ で、このアプリをオンにしてください。")
+            } else {
+                // 理由を消さずにそのまま出す。「押しても何も起きない」が一番たちが悪い。
+                backgroundNote = (keeper.firstError ?? String(localized: "背面で動かせません。")) + String(localized: "画面を消すとタイマーが止まります。")
+                backgroundHelp = nil
+            }
         }
     }
 
