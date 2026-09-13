@@ -70,6 +70,12 @@ struct PhoneSetupView: View {
                 .buttonStyle(.plain)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 12)
+
+                // いちばん下。**実機にどのビルドが入っているか**をここで見分ける（BuildInfo）
+                Text(BuildInfo.text)
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(Skin.normal.inkDim)
+                    .accessibilityIdentifier("buildInfo")
             }
             .padding(.vertical, 20)
         }

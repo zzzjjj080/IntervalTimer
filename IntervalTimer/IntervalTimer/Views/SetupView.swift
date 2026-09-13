@@ -93,6 +93,13 @@ struct SetupView: View {
                         .padding(.top, 8)
                     }
                     #endif
+
+                    // いちばん下。**実機にどのビルドが入っているか**をここで見分ける（BuildInfo）
+                    Text(BuildInfo.text)
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(Skin.normal.inkDim)
+                        .padding(.top, 10)
+                        .accessibilityIdentifier("buildInfo")
                 }
                 .padding(.horizontal, 6)
                 .padding(.bottom, 6)

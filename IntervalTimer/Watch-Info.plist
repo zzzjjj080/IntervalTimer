@@ -28,5 +28,9 @@
 	<array>
 		<string>workout-processing</string>
 	</array>
+	<!-- 実機にどのビルドが入っているかを設定画面に出すための印（BuildInfo）。
+	     インストール用スクリプトが IT_BUILD_STAMP を渡す。Xcode から直接ビルドすると空になる -->
+	<key>ITBuildStamp</key>
+	<string>$(IT_BUILD_STAMP)</string>
 </dict>
 </plist>

@@ -50,14 +50,19 @@ DEV=$(echo "$LINE" | grep -oE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[
 MODEL=$(echo "$LINE" | sed -E 's/.*connected +//')
 echo "→ ${MODEL} にインストールします"
 
+# 実機の設定画面のいちばん下に出す印（BuildInfo）。**手で増やさない。**
+# b<コミット数> とビルド時刻。まだコミットしていない変更があれば + を付ける
+STAMP="b$(git -C "$ROOT" rev-list --count HEAD)$(git -C "$ROOT" diff --quiet HEAD -- . 2>/dev/null || echo +) $(date '+%m/%d %H:%M')"
+
 cd "$ROOT/IntervalTimer"
 # 署名はプロジェクト側にターゲットごとに書いてある。
 # 本体とコンプリケーションで別のプロファイルが要るので、
 # コマンドラインで一括指定すると拡張のほうが必ず落ちる。
 xcodebuild -project IntervalTimer.xcodeproj -scheme "IntervalTimer Watch App" -configuration Debug \
   -destination "platform=watchOS,id=$DEV" -destination-timeout 30 -derivedDataPath /tmp/it-device \
-  build 2>&1 | grep -E "error:|BUILD SUCCEEDED"
+  IT_BUILD_STAMP="$STAMP" build 2>&1 | grep -E "error:|BUILD SUCCEEDED"
 
 xcrun devicectl device install app --device "$DEV" \
   "/tmp/it-device/Build/Products/Debug-watchos/IntervalTimer Watch App.app" 2>&1 | grep -E "bundleID"
 echo "✅ 完了。Watchのホーム画面に「インターバル」が出ます"
+echo "   設定画面をいちばん下までスクロールして「$STAMP」が出ていれば、入れ替わっています"
