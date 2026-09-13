@@ -39,6 +39,17 @@ final class WorkoutKeeper: NSObject {
     private(set) var errors: [String] = []
     var firstError: String? { errors.first }
 
+    #if DEBUG
+    /// いま握っているセッションの状態を1行で。足あとに添えて、戻された瞬間の様子を残す。
+    /// ワークアウト: 1=notStarted 2=running 3=ended 4=paused 5=prepared 6=stopped
+    /// 予備: 0=notStarted 1=scheduled 2=running 3=invalid
+    var stateText: String {
+        let w = session.map { String($0.state.rawValue) } ?? "-"
+        let e = extended.map { String($0.state.rawValue) } ?? "-"
+        return "mode=\(mode) W=\(w) E=\(e)"
+    }
+    #endif
+
     private let store = HKHealthStore()
     /// 自分で終わらせている最中かどうか。
     /// `session.end()` を呼ぶと `didChangeTo .ended` が飛んでくるので、
@@ -61,6 +72,7 @@ final class WorkoutKeeper: NSObject {
     private func log(_ message: String) {
         #if DEBUG
         print("[WorkoutKeeper] \(message)")
+        Trail.shared.add(message)
         #endif
     }
 

@@ -4,10 +4,21 @@ import IntervalTimerUI
 
 struct RootView: View {
     @Environment(Runner.self) private var runner
+    @Environment(\.scenePhase) private var phase
 
     var body: some View {
         screens
             .task { startForCheckingIfAsked() }
+            #if DEBUG
+            // 文字盤へ戻された理由を後から読むための足あと。
+            // 腕を下ろした（inactive が続く）のか、いきなり background なのかと、
+            // その瞬間にセッションが生きていたかを残す
+            .onChange(of: phase, initial: true) { old, new in
+                let line = "画面 \(old)→\(new) \(runner.keeper.stateText)"
+                print("[Root] \(line)")
+                Trail.shared.add(line)
+            }
+            #endif
     }
 
     @ViewBuilder

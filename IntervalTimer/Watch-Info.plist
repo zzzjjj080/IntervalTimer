@@ -23,7 +23,7 @@
 
 	<!-- 走っている間、アプリを前面に留めて動かし続けるため。
 	     - workout-processing … HKWorkoutSession 用（本筋。上限なし）
-	     - self-care ………………… WKExtendedRuntimeSession 用（予備。上限1時間）
+	     - self-care ………………… WKExtendedRuntimeSession 用（予備。**上限10分**。1時間は誤り、ワンタップタイマーで実測）
 
 	     **予備の側は、この種別を書かないと start() しても即 invalidate される。**
 	     ヘルスケアを断った人は本筋を使えないので、これが無いと
