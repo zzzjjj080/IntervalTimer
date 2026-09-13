@@ -5,8 +5,16 @@ import Observation
 ///
 /// 文字盤へ戻されると、こちらのコードは止まる。その間はログも出ないので、
 /// 「なぜ戻ったか」はコンソールを見ていても分からないことがある。
-/// 開き直すと新しい出来事で上書きされるので、保存しておいて設定画面に出す
+/// 開き直すと新しい出来事で上書きされるので、保存しておく
 /// （ワンタップタイマーで実際にそうなった。引き継ぎ書 4-131）。
+///
+/// **画面には出さない。** 設定画面の下に並べていたら、本人から見ると開始の下にログが並んでいて、
+/// いちばん下の版の表示（BuildInfo）が見つけにくかった。読むときは Mac から Watch の中身を直接取る。
+///
+///     xcrun devicectl device copy from --device <Watch> --domain-type appDataContainer \
+///       --domain-identifier com.zzzjjj080.IntervalTimer.watchkitapp \
+///       --source Library/Preferences/com.zzzjjj080.IntervalTimer.watchkitapp.plist --destination x.plist
+///     /usr/libexec/PlistBuddy -c "Print :debugTrail" x.plist
 ///
 /// 書き込むのは DEBUG のときだけ。リリース構成では常に空。
 @MainActor

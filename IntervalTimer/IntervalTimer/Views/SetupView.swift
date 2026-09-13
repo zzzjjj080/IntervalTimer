@@ -79,20 +79,6 @@ struct SetupView: View {
                             .padding(.top, 6)
                     }
 
-                    #if DEBUG
-                    // 動作確認用の足あと。下へスクロールすると読める。新しい順
-                    if !Trail.shared.lines.isEmpty {
-                        VStack(alignment: .leading, spacing: 2) {
-                            ForEach(Array(Trail.shared.lines.enumerated()), id: \.offset) { item in
-                                Text(item.element)
-                            }
-                        }
-                        .font(.system(size: 9, design: .monospaced))
-                        .foregroundStyle(Skin.normal.inkDim)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 8)
-                    }
-                    #endif
 
                     // いちばん下。**実機にどのビルドが入っているか**をここで見分ける（BuildInfo）
                     Text(BuildInfo.text)
