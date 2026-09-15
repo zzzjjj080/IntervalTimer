@@ -25,14 +25,19 @@ struct PhoneSetupView: View {
                             colors: Skin.normal.segmentColors(parts: parts),
                             lineWidth: 12, allDone: true)
                     .overlay {
+                        // 「/30秒」は記号に頼っていて分かりにくかった。**「1回あたり 30秒」と言葉で書く。**
+                        // すぐ下の「分割 4回」と同じ「回」でそろえる。割り切れないときは「約」が付く
                         VStack(spacing: 2) {
-                            Text("/\(TimeText.brief(config.splitSeconds))")
+                            Text(TimeText.perSplit(config.splitSeconds))
                                 .font(.system(size: 34, weight: .heavy, design: .rounded))
+                                .minimumScaleFactor(0.6)
+                                .lineLimit(1)
                                 .foregroundStyle(Skin.normal.accent)
-                            Text("1区切り")
+                            Text("1回あたり")
                                 .font(.subheadline)
                                 .foregroundStyle(Skin.normal.inkDim)
                         }
+                        .padding(.horizontal, 24)
                     }
                     .padding(.bottom, 28)
 

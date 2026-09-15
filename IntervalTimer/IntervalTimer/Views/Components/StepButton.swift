@@ -8,7 +8,8 @@ import IntervalTimerUI
 /// `Button` ではなく長押しで受けている。`Button` は指を離したときにしか呼ばれないので、
 /// 押しっぱなしを拾えない。`pressing:` なら押した瞬間と離した瞬間の両方が来る。
 ///
-/// グローブでも押せるよう、高さ44pt・幅は呼び出し側が決める。
+/// グローブでも押せるよう、幅と高さは呼び出し側が決める（高さの既定は44pt）。
+/// 設定画面はスクロールさせないので、画面の高さから割り振った高さを渡す。
 /// `minus.circle` のような細い記号は避け、太い `minus` / `plus` を使う。
 struct StepButton: View {
     let systemName: String
@@ -16,15 +17,17 @@ struct StepButton: View {
     let isUp: Bool
     let tint: Color
     let width: CGFloat
+    var height: CGFloat = 44
     let step: () -> Void
 
     @State private var holding: Task<Void, Never>?
 
     var body: some View {
         Image(systemName: systemName)
-            .font(.system(size: 18, weight: .bold))
+            // 記号の大きさも高さに合わせる。小さい画面で記号だけ大きく残らないように
+            .font(.system(size: max(13, min(18, height * 0.40)), weight: .bold))
             .foregroundStyle(tint)
-            .frame(width: width, height: 44)
+            .frame(width: width, height: height)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .fill(tint.opacity(holding == nil ? 0.16 : 0.34))

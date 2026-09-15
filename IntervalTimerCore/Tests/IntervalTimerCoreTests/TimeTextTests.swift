@@ -71,6 +71,27 @@ struct TimeTextTests {
         #expect(TimeText.brief(100, locale: ja) == "1分40秒")
     }
 
+    @Test func 一回の長さは割り切れればそのまま出す() {
+        #expect(TimeText.perSplit(TimerConfig(minutes: 2, parts: 4).splitSeconds, locale: ja) == "30秒")
+        #expect(TimeText.perSplit(TimerConfig(minutes: 20, parts: 4).splitSeconds, locale: ja) == "5分")
+        #expect(TimeText.perSplit(TimerConfig(minutes: 20, parts: 3).splitSeconds, locale: ja) == "6分40秒")
+    }
+
+    @Test func 一回の長さが割り切れないときは約を付けて四捨五入する() {
+        // 1分×7 = 8.57…秒。切り上げの brief だと「9秒」、切り捨てだと「8秒」。どちらも言い切りになる
+        #expect(TimeText.perSplit(TimerConfig(minutes: 1, parts: 7).splitSeconds, locale: ja) == "約9秒")
+        // 1分×8 = 7.5秒 → 約8秒
+        #expect(TimeText.perSplit(TimerConfig(minutes: 1, parts: 8).splitSeconds, locale: ja) == "約8秒")
+        // 10分×7 = 85.71…秒 → 約1分26秒
+        #expect(TimeText.perSplit(TimerConfig(minutes: 10, parts: 7).splitSeconds, locale: ja) == "約1分26秒")
+    }
+
+    @Test func 一回の長さの英語表記() {
+        let en = Locale(identifier: "en_US")
+        #expect(TimeText.perSplit(30, locale: en) == "30s")
+        #expect(TimeText.perSplit(TimerConfig(minutes: 1, parts: 7).splitSeconds, locale: en) == "~9s")
+    }
+
     @Test func プレビューの日本語表記() {
         #expect(TimeText.japanese(300, locale: ja) == "5分00秒")
         #expect(TimeText.japanese(140, locale: ja) == "2分20秒")

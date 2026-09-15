@@ -43,6 +43,18 @@ public enum TimeText {
         return "\(m)\(mu)\(sec)\(su)"
     }
 
+    /// 1回（1区切り）の長さ。設定画面で「1回 30秒」と出すときに使う。
+    ///
+    /// **割り切れないときは「約」を付けて四捨五入する**（英語は `~`）。
+    /// 境目はちょうどの秒に丸めてあるので、1分×7 の区切りは 9・8・9…秒と揺れる（``TimerConfig/boundary(_:)``）。
+    /// ここで `brief` のように切り上げて「8秒」と言い切ると、実際と合わない。
+    public static func perSplit(_ seconds: Double, locale: Locale = .current) -> String {
+        let rounded = seconds.rounded()
+        guard abs(seconds - rounded) > epsilon else { return brief(seconds, locale: locale) }
+        let about = locale.language.languageCode == .japanese ? "約" : "~"
+        return about + brief(rounded, locale: locale)
+    }
+
     /// 分と秒の単位。日本語だけ全角の漢字、それ以外は英語の略記。
     private static func units(for locale: Locale) -> (String, String) {
         locale.language.languageCode == .japanese ? ("分", "秒") : ("m", "s")

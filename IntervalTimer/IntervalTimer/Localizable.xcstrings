@@ -56,6 +56,17 @@
       },
       "comment": "いま始めたら終わる時刻の見出し"
     },
+    "1回 %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ each"
+          }
+        }
+      },
+      "comment": "設定画面。1回（1区切り）の長さ。「分割 4回」と同じ「回」でそろえる"
+    },
     "開始": {
       "localizations": {
         "en": {

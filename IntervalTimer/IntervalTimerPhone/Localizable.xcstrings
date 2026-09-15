@@ -51,22 +51,23 @@
         }
       }
     },
+    "1回あたり": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "each"
+          }
+        }
+      },
+      "comment": "設定画面。円環の中の長さの下に添える"
+    },
     "開始": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Start"
-          }
-        }
-      }
-    },
-    "1区切り": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "one part"
           }
         }
       }
